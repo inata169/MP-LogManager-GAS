@@ -2,7 +2,7 @@
  * Service Worker - PWAオフライン対応
  */
 
-const CACHE_NAME = 'mp-logmanager-v11-20260326';
+const CACHE_NAME = 'mp-logmanager-gas-v1-20260330';
 const urlsToCache = [
     './',
     'index.html',
