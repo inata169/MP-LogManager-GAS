@@ -1,0 +1,21 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+*.db
+*.sqlite3
+
+# Logs and temp
+_*.txt
+*.log
+
+# Backups
+backups/
+
+# Environment
+.env
+.venv
+venv/

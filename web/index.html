@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>MP-LogManager</title>
+    <link rel="stylesheet" href="css/style.css?v=20260324">
+    <link rel="stylesheet" id="hljs-theme-light" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" id="hljs-theme-dark" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" disabled>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <h1>MP-LogManager</h1>
+        <div class="header-actions">
+            <button id="refresh-btn" class="icon-btn" aria-label="Refresh data">
+                <span class="icon">🔄</span>
+            </button>
+            <button id="settings-btn" class="icon-btn" aria-label="Settings">
+                <span class="icon">⚙️</span>
+            </button>
+            <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme">
+                <span class="icon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="app-main">
+        <!-- Tasks View -->
+        <div id="tasks-view" class="view active">
+            <div class="view-header">
+                <h2>Tasks</h2>
+                <button id="add-task-btn" class="btn btn-primary">+ 新規</button>
+            </div>
+
+            <div class="filter-bar">
+                <div class="search-container">
+                    <input type="text" id="task-search" class="search-input" placeholder="🔍 タスクを検索...">
+                </div>
+                <div class="filter-controls">
+                    <label class="filter-checkbox-label">
+                        <input type="checkbox" id="hide-completed" checked> 完了済みを非表示
+                    </label>
+                    <select id="filter-category" class="filter-select">
+                        <option value="all">すべてのカテゴリ</option>
+                        <option value="QA">QA</option>
+                        <option value="Planning">Planning</option>
+                        <option value="Treatment Planning">Treatment Planning</option>
+                        <option value="Commissioning">Commissioning</option>
+                        <option value="Research">Research</option>
+                        <option value="Meeting">Meeting</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select id="sort-tasks" class="filter-select" aria-label="並べ替え">
+                        <option value="default">デフォルト (状態・期限順)</option>
+                        <option value="due_asc">期限が近い順</option>
+                        <option value="due_desc">期限が遠い順</option>
+                        <option value="created_desc">新着順 (作成日)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="tasks-list" class="tasks-list">
+                <!-- Tasks will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Journal View -->
+        <div id="journal-view" class="view">
+            <div class="view-header">
+                <h2>Journal</h2>
+                <div class="date-nav">
+                    <button id="prev-day" class="icon-btn">◀</button>
+                    <input type="date" id="journal-date" class="date-input">
+                    <button id="next-day" class="icon-btn">▶</button>
+                </div>
+            </div>
+
+            <!-- Filter Bar for Journal -->
+            <div class="filter-bar">
+                <input type="text" id="journal-search" placeholder="🔍 Journalを検索..." class="search-input">
+            </div>
+
+            <div class="journal-layout-container">
+                <div class="journal-sidebar">
+                    <div id="journal-entries" class="journal-entries">
+                        <!-- Journal entries will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="journal-editor">
+                    <input type="text" id="journal-title" class="journal-title-input" placeholder="タイトル">
+
+                    <textarea id="journal-content" class="journal-textarea" placeholder="内容を入力..."></textarea>
+
+                    <div class="editor-actions">
+                        <button id="save-journal" class="btn btn-primary">保存</button>
+                        <button id="print-journal" class="btn btn-secondary">🖨️ 印刷</button>
+                        <button id="new-entry" class="btn btn-secondary">新規エントリ</button>
+                        <span id="draft-status" class="draft-status" style="display: none;">下書き保存済み</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-view="tasks">
+            <span class="nav-icon">✅</span>
+            <span class="nav-label">Tasks</span>
+        </button>
+        <button class="nav-btn" data-view="journal">
+            <span class="nav-icon">📓</span>
+            <span class="nav-label">Journal</span>
+        </button>
+    </nav>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">新規タスク</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="task-title" class="input" placeholder="タイトル" required>
+                <select id="task-category" class="input">
+                    <option value="QA">QA</option>
+                    <option value="Planning">Planning</option>
+                    <option value="Treatment Planning">Treatment Planning</option>
+                    <option value="Commissioning">Commissioning</option>
+                    <option value="Research">Research</option>
+                    <option value="Meeting">Meeting</option>
+                    <option value="Other">Other</option>
+                </select>
+                <select id="task-priority" class="input">
+                    <option value="High">High</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+                <input type="date" id="task-due-date" class="input">
+                <textarea id="task-details" class="input textarea" placeholder="詳細"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button id="save-task" class="btn btn-primary">保存</button>
+                <button class="btn btn-secondary modal-close">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>設定</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label for="github-token">GitHub Personal Access Token:</label>
+                <input type="password" id="github-token" class="input" placeholder="ghp_...">
+                <p class="help-text">
+                    <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a> で `repo`
+                    スコープのトークンを発行してください。
+                </p>
+
+                <div class="settings-group">
+                    <label for="github-owner">GitHub Owner (ユーザー名):</label>
+                    <input type="text" id="github-owner" class="input" placeholder="inata169">
+                </div>
+                <div class="settings-group">
+                    <label for="github-repo">GitHub Repository (リポジトリ名):</label>
+                    <input type="text" id="github-repo" class="input" placeholder="MP-LogManager">
+                </div>
+                <p class="help-text">空欄の場合、URLから自動取得を試みます。</p>
+
+            </div>
+            <div class="modal-footer">
+                <button id="save-settings" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js?v=20260227"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script src="js/api.js?v=20260326"></script>
+    <script src="js/tasks.js?v=20260326"></script>
+    <script src="js/journal.js?v=20260326"></script>
+    <script src="js/app.js?v=20260326"></script>
+
+    <!-- 印刷用エリア (通常は非表示) -->
+    <div id="print-area" class="print-only">
+        <h1 id="print-title"></h1>
+        <div id="print-content" class="markdown-body"></div>
+    </div>
+</body>
+</html>
