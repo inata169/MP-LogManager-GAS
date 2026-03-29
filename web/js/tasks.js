@@ -12,13 +12,13 @@ let currentEditingTaskId = null;
 async function loadTasks() {
     try {
         showLoading(true);
-        const { tasks, sha } = await githubAPI.getTasks();
-        tasksData = tasks;
+        const { tasks, sha } = await DataAPI.getTasks();
+        tasksData = tasks || [];
         tasksSha = sha;
         renderTasks();
     } catch (error) {
         console.error('Failed to load tasks:', error);
-        alert('タスクの読み込みに失敗しました。以前のトークンが無効になっている可能性があります。ヘッダーの「⚙️（設定）」アイコンから新しいGitHub Tokenを設定してください。');
+        alert('タスクの読み込みに失敗しました。ヘッダーの「⚙️（設定）」アイコンから GAS Web App URL が正しく設定されているか確認してください。');
     } finally {
         showLoading(false);
     }
@@ -197,8 +197,10 @@ async function deleteTask(taskId) {
 async function saveTasks() {
     try {
         showLoading(true);
-        const result = await githubAPI.updateTasks(tasksData, tasksSha);
-        tasksSha = result.content.sha;  // 新しいSHAを保存
+        const result = await DataAPI.updateTasks(tasksData);
+        if (result.content && result.content.sha) {
+            tasksSha = result.content.sha;
+        }
         renderTasks();
     } catch (error) {
         console.error('Failed to save tasks:', error);

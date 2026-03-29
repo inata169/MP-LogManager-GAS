@@ -15,13 +15,13 @@ let saveDraftTimeout = null;
 async function loadJournals() {
     try {
         showLoading(true);
-        const { journals, sha } = await githubAPI.getJournals();
-        journalsData = journals;
+        const { journals, sha } = await DataAPI.getJournals();
+        journalsData = journals || [];
         journalsSha = sha;
         renderJournals();
     } catch (error) {
         console.error('Failed to load journals:', error);
-        alert('Journalの読み込みに失敗しました');
+        alert('Journalの読み込みに失敗しました。ヘッダーの「⚙️（設定）」アイコンから GAS Web App URL が正しく設定されているか確認してください。');
     } finally {
         showLoading(false);
     }
@@ -164,8 +164,10 @@ async function saveJournal() {
 async function saveJournals() {
     try {
         showLoading(true);
-        const result = await githubAPI.updateJournals(journalsData, journalsSha);
-        journalsSha = result.content.sha;
+        const result = await DataAPI.updateJournals(journalsData);
+        if (result.content && result.content.sha) {
+            journalsSha = result.content.sha;
+        }
         renderJournals();
     } catch (error) {
         console.error('Failed to save journals:', error);

@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     initRefresh();
     initSettings();
 
-    // GitHub Token確認
-    if (!githubAPI.hasToken()) {
+    // GAS URL確認
+    if (!gasAPI.hasUrl()) {
         showModal('settings-modal');
         return;
     }
@@ -106,16 +106,18 @@ function initModals() {
 
     // 設定保存
     document.getElementById('save-settings').addEventListener('click', () => {
+        const gasUrl = document.getElementById('gas-url').value.trim();
         const token = document.getElementById('github-token').value.trim();
         const owner = document.getElementById('github-owner').value.trim();
         const repo = document.getElementById('github-repo').value.trim();
 
-        if (!token) {
-            alert('GitHub Tokenを入力してください');
+        if (!gasUrl) {
+            alert('GAS Web App URL を入力してください');
             return;
         }
 
-        githubAPI.setToken(token);
+        gasAPI.setUrl(gasUrl);
+        if (token) githubAPI.setToken(token);
 
         // Owner/Repoを保存（空の場合は削除して自動取得に任せる）
         if (owner) {
@@ -213,11 +215,9 @@ function initSettings() {
     if (!settingsBtn) return;
 
     settingsBtn.addEventListener('click', () => {
-        // 現在のトークンをフィールドに反映
-        const token = localStorage.getItem('github_token') || '';
-        document.getElementById('github-token').value = token;
-
-        // Owner/Repoも反映
+        // 現在の設定を反映
+        document.getElementById('gas-url').value = localStorage.getItem('gas_url') || '';
+        document.getElementById('github-token').value = localStorage.getItem('github_token') || '';
         document.getElementById('github-owner').value = localStorage.getItem('github_owner') || '';
         document.getElementById('github-repo').value = localStorage.getItem('github_repo') || '';
 

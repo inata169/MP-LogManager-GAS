@@ -166,22 +166,26 @@
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <label for="github-token">GitHub Personal Access Token:</label>
-                <input type="password" id="github-token" class="input" placeholder="ghp_...">
-                <p class="help-text">
-                    <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a> で `repo`
-                    スコープのトークンを発行してください。
-                </p>
+                <div class="settings-group">
+                    <label for="gas-url">GAS Web App URL (Google Drive API):</label>
+                    <input type="text" id="gas-url" class="input" placeholder="https://script.google.com/macros/s/.../exec">
+                </div>
+                <p class="help-text">GASでデプロイしたWeb AppのURLを入力してください（必須）。</p>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
 
                 <div class="settings-group">
-                    <label for="github-owner">GitHub Owner (ユーザー名):</label>
+                    <label for="github-token">GitHub Personal Access Token (Optional):</label>
+                    <input type="password" id="github-token" class="input" placeholder="ghp_...">
+                </div>
+                <div class="settings-group">
+                    <label for="github-owner">GitHub Owner:</label>
                     <input type="text" id="github-owner" class="input" placeholder="inata169">
                 </div>
                 <div class="settings-group">
-                    <label for="github-repo">GitHub Repository (リポジトリ名):</label>
+                    <label for="github-repo">GitHub Repository:</label>
                     <input type="text" id="github-repo" class="input" placeholder="MP-LogManager">
                 </div>
-                <p class="help-text">空欄の場合、URLから自動取得を試みます。</p>
 
             </div>
             <div class="modal-footer">
