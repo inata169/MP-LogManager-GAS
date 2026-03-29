@@ -1,3 +1,29 @@
+# 日次サマリー - 2026-03-30
+
+## 🚀 Google Drive + GAS 連携への移行と履歴のクリーンアップ
+個人データの流出リスクを完全に排除するため、GitHub API に依存しない Google Drive + Google Apps Script (GAS) 連携構成への抜本的な移行を実施しました。
+
+### 実装・対応内容
+- **独立したクリーンリポジトリの作成**:
+  - `MP-LogManager-new` をベースに `MP-LogManager-GAS` を新規作成。
+  - Git履歴を完全にリセット（`.git`の削除）し、過去のコミットに含まれる機密データを完全に抹消。
+  - 公開用の `data/journals.json`, `data/tasks.json` を空配列 `[]` にダミー化。
+- **Google Apps Script (GAS) API の構築**:
+  - Google Drive 上の JSON ファイルを操作する `doGet` / `doPost` エンドポイントを実装。
+  - `journals.json` と `tasks.json` の両方の読み書きに対応（CORS回避のため text/plain POST）。
+- **Web App フロントエンドの改修**:
+  - `web/js/api.js` 等の通信ロジックを刷新し、データの取得・保存先を GAS API へ切り替え。
+  - 設定画面に「GAS Web App URL」の入力フィールドを追加し、ユーザー自身の設定で Drive と同期可能に。
+- **公開と整備**:
+  - `MP-LogManager-GAS` を GitHub に新規パブリックリポジトリとして公開。
+  - README を刷新し、高セキュリティ構成（GAS連携）についての公式ドキュメントを追加。
+
+### 変更ファイル (MP-LogManager-GAS)
+- `web/js/api.js`, `web/js/tasks.js`, `web/js/journal.js`, `web/js/app.js`, `web/index.html`
+- `README.md`
+
+---
+
 # 日次サマリー - 2026-03-26
 
 ## 🐛 Journal 印刷時の古いデータ残留バグの修正

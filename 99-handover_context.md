@@ -1,20 +1,21 @@
-# Handover Context (2026-03-26 最終更新)
+# Handover Context (2026-03-30 更新)
 
 ## 📌 現在のステータス
-v1.4.1 リリース後のフィードバックに基づき、Journal 印刷時の重大な表示バグ（古いデータの残留）を修正しました。現在、Web App は安定した状態にあります。
+個人データの保護を目的とした **Google Drive + GAS 連携構成への移行が完了**しました。
+GitHub リポジトリ `MP-LogManager-GAS` が最新の「クリーンな（機密履歴のない）」プログラムリポジトリ、Google Drive が「自分専用のデータストレージ」として機能しています。
 
 ### ✅ 実装/完了済み
-- **Journal Print Fix (iPhone Optimization)**: 印刷用エリアをinnerHTMLで完全に再構築し、残分を排除。待機時間を150msに延長。
-- **PWA Cache Buster**: `sw.js` の `CACHE_NAME` と `index.html` の script パラメータを `v11 / 20260326` へ更新し、iPhone環境の強制更新を誘発。
-- **Gemini Content Fix (Applied to Print)**: 印刷内容からも Gemini 引用タグを自動除去。
-- **v1.4.1 Baseline**: すべて正常動作中。
+- **GAS integration**: `doGet` / `doPost` による Google Drive 上の JSON ファイル読み書き。
+- **Zero-History Repository**: 過去の機密データ履歴を完全に排除した新規リポジトリ作成。
+- **PWA Cloud Sync**: GitHub Pages から iPhone 経由で Google Drive へデータを保存可能に。
 
 ### ✅ Git ステータス
-- 印刷バグ修正分を含め、最新の状態を `main` ブランチへプッシュ済みです。
+- 新規リポジトリ `MP-LogManager-GAS` へ全ての変更をプッシュ、GitHub Pages を有効化済みです。
 
 ## 🎯 次のステップ
-- **Web App Dashboard の実装**: デスクトップ版の統計機能を Web App へ移植（Chart.js 等の導入検討）。
-- **ユーザーフィードバック継続収集**: 印刷機能の再確認と、実運用でのバグ出し。
+- **フィードバックの収集**: GAS 経由での保存速度、iPhone での動作感の再確認。
+- **後処理**: 不要になった旧リポジトリ (`...-new` 等) から完全にデータを引き上げ、アーカイブの検討。
+- **Web App Dashboard の追加検討**: 新しい GAS 構成での統計データ取得の最適化。
 
 ---
-**Reset Command:** この後はチャットをリセットして問題ありません。
+**Reset Command:** 今回の移行により大きなアーキテクチャ更新が行われたため、改めてリセット後のチャットを推奨します。
