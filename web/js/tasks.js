@@ -18,7 +18,7 @@ async function loadTasks() {
         renderTasks();
     } catch (error) {
         console.error('Failed to load tasks:', error);
-        alert('タスクの読み込みに失敗しました。ヘッダーの「⚙️（設定）」アイコンから GAS Web App URL が正しく設定されているか確認してください。');
+        showToast('タスクの読み込みに失敗しました。URLの設定を確認してください。', 'error');
     } finally {
         showLoading(false);
     }
@@ -149,7 +149,7 @@ function openEditTaskModal(taskId) {
 async function saveTask() {
     const title = document.getElementById('task-title').value.trim();
     if (!title) {
-        alert('タイトルを入力してください');
+        showToast('タイトルを入力してください', 'warning');
         return;
     }
 
@@ -204,7 +204,7 @@ async function saveTasks() {
         renderTasks();
     } catch (error) {
         console.error('Failed to save tasks:', error);
-        alert('タスクの保存に失敗しました');
+        showToast('タスクの保存に失敗しました', 'error');
     } finally {
         showLoading(false);
     }

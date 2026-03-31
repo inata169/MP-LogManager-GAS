@@ -21,7 +21,7 @@ async function loadJournals() {
         renderJournals();
     } catch (error) {
         console.error('Failed to load journals:', error);
-        alert('Journalの読み込みに失敗しました。ヘッダーの「⚙️（設定）」アイコンから GAS Web App URL が正しく設定されているか確認してください。');
+        showToast('Journalの読み込みに失敗しました。URLの設定を確認してください。', 'error');
     } finally {
         showLoading(false);
     }
@@ -131,7 +131,7 @@ async function saveJournal() {
     if (easyMDE) easyMDE.value(content); // エディタ側も更新しておくと親切
 
     if (!title || !content) {
-        alert('タイトルと内容を入力してください');
+        showToast('タイトルと内容を入力してください', 'warning');
         return;
     }
 
@@ -171,7 +171,7 @@ async function saveJournals() {
         renderJournals();
     } catch (error) {
         console.error('Failed to save journals:', error);
-        alert('Journalの保存に失敗しました');
+        showToast('Journalの保存に失敗しました', 'error');
     } finally {
         showLoading(false);
     }
@@ -379,6 +379,6 @@ async function deleteJournalEntry(event, entryId) {
         console.log('Journal entry deleted:', entryId);
     } catch (error) {
         console.error('Failed to delete journal entry:', error);
-        alert('削除に失敗しました');
+        showToast('削除に失敗しました', 'error');
     }
 }

@@ -65,30 +65,95 @@ class GasAPI {
     async fetchData(type) {
         if (!this.hasUrl()) throw new Error('GAS URLが設定されていません');
         
-        // ブラウザのキャッシュを回避するためにタイムスタンプを付与
-        const response = await fetch(`${this.url}?type=${type}&t=${Date.now()}`);
-        if (!response.ok) throw new Error(`GAS API Error: ${response.status}`);
-        return response.json();
+        try {
+            // 指数バックオフを伴うリトライを適用
+            const response = await this.fetchWithRetry(`${this.url}?type=${type}&t=${Date.now()}`);
+            if (!response.ok) throw new Error(`GAS API Error: ${response.status}`);
+            return response.json();
+        } catch (error) {
+            console.error(`FetchData failed (${type}):`, error);
+            throw error;
+        }
     }
 
     async updateData(type, data) {
         if (!this.hasUrl()) throw new Error('GAS URLが設定されていません');
 
-        // GASのdoPostでパース可能な形式で送信
-        const response = await fetch(this.url, {
-            method: 'POST',
-            mode: 'no-cors', // 重要: GASの仕様上、レスポンスが見えない場合がある
-            headers: {
-                'Content-Type': 'text/plain' // CORS回避のため text/plain を推奨
-            },
-            body: JSON.stringify({
-                type: type,
-                data: data
-            })
-        });
+        try {
+            // POST は失敗時の副作用を考慮し、通常のリトライではなく timeout のみ適用
+            const response = await this.fetchWithTimeout(this.url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify({
+                    type: type,
+                    data: data
+                })
+            }, 15000); // 更新は少し長めに待機 (15s)
 
-        // no-cors の場合、response.ok は常に false になるが、送信自体は成功している
-        return { status: 'requested' }; 
+            return { status: 'requested' };
+        } catch (error) {
+            console.error(`UpdateData failed (${type}):`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * GASへの疎通確認
+     */
+    async ping() {
+        if (!this.hasUrl()) return false;
+        try {
+            // 短いタイムアウトで接続確認
+            const response = await this.fetchWithTimeout(`${this.url}?type=ping&t=${Date.now()}`, {}, 5000);
+            return response.ok;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
+     * タイムアウト付きフェッチ
+     */
+    async fetchWithTimeout(resource, options = {}, timeout = 10000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        
+        try {
+            const response = await fetch(resource, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            return response;
+        } catch (error) {
+            clearTimeout(id);
+            throw error;
+        }
+    }
+
+    /**
+     * 指数バックオフを伴うオートリトライ付きフェッチ
+     */
+    async fetchWithRetry(resource, options = {}, retries = 3, backoff = 1000) {
+        try {
+            const response = await this.fetchWithTimeout(resource, options);
+            if (response.ok) return response;
+            
+            if (retries > 0 && (response.status >= 500 || response.status === 408)) {
+                await new Promise(resolve => setTimeout(resolve, backoff));
+                return this.fetchWithRetry(resource, options, retries - 1, backoff * 2);
+            }
+            return response;
+        } catch (error) {
+            if (retries > 0 && error.name !== 'AbortError') {
+                await new Promise(resolve => setTimeout(resolve, backoff));
+                return this.fetchWithRetry(resource, options, retries - 1, backoff * 2);
+            }
+            throw error;
+        }
     }
 }
 

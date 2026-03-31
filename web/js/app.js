@@ -112,7 +112,7 @@ function initModals() {
         const repo = document.getElementById('github-repo').value.trim();
 
         if (!gasUrl) {
-            alert('GAS Web App URL を入力してください');
+            showToast('GAS Web App URL を入力してください', 'error');
             return;
         }
 
@@ -133,7 +133,39 @@ function initModals() {
         }
 
         hideModal('settings-modal');
-        location.reload();  // リロードしてデータ読み込み
+        showToast('設定を保存しました。リロードします...', 'success');
+        setTimeout(() => location.reload(), 1500);  // リロードしてデータ読み込み
+    });
+
+    // 接続テスト
+    document.getElementById('test-gas-connection').addEventListener('click', async () => {
+        const gasUrl = document.getElementById('gas-url').value.trim();
+        if (!gasUrl) {
+            showToast('URLを入力してください', 'warning');
+            return;
+        }
+
+        const btn = document.getElementById('test-gas-connection');
+        const originalText = btn.textContent;
+        btn.textContent = 'テスト中...';
+        btn.disabled = true;
+
+        const tempApi = new GasAPI();
+        tempApi.setUrl(gasUrl);
+
+        try {
+            const success = await tempApi.ping();
+            if (success) {
+                showToast('接続成功！', 'success');
+            } else {
+                showToast('接続に失敗しました。URLまたはGASの公開設定を確認してください。', 'error');
+            }
+        } catch (e) {
+            showToast('エラーが発生しました', 'error');
+        } finally {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
     });
 }
 
@@ -156,6 +188,31 @@ function hideModal(modalId) {
  */
 function showLoading(show) {
     document.getElementById('loading').classList.toggle('active', show);
+}
+
+/**
+ * トースト通知を表示
+ */
+function showToast(message, type = 'info', duration = 3000) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    let icon = 'ℹ️';
+    if (type === 'success') icon = '✅';
+    if (type === 'error') icon = '❌';
+    if (type === 'warning') icon = '⚠️';
+
+    toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+    container.appendChild(toast);
+
+    // 自動消去
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
 }
 
 /**
@@ -198,7 +255,7 @@ function initRefresh() {
             console.log('Data refreshed');
         } catch (error) {
             console.error('Refresh failed:', error);
-            alert('同期に失敗しました。');
+            showToast('同期に失敗しました。接続を確認してください。', 'error');
         } finally {
             showLoading(false);
             // アニメーション停止
