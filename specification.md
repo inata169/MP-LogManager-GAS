@@ -17,9 +17,9 @@
 *   **キャッシュ制御:** PWA のサービスワーカー (`sw.js`) によるオフライン動作と、API リクエストへのタイムスタンプ付与による最新データの確実な取得。
 *   **Journal エディタ:** EasyMDE による Markdown リッチ編集、PDF 印刷、オートセーブ機能。
 
-### 3.2 デスクトップ版 (Python / 移行準備中)
-*   **現状:** 現時点でのデスクトップ版 (`main.py`, `sync_json.py`) は従来の Git 同期方式に基づいており、GAS エンドポイントを介した同期は未実装である。
-*   **将来像:** デスクトップ版も GAS API を介して Google Drive 上の JSON を直接操作し、ローカル SQLite との同期を可能にする予定。
+### 3.2 デスクトップ版 (Python / 終役)
+*   **現状:** 従来のデスクトップ版 (`main.py`, `sync_json.py` 等) は v2.0.0 をもって廃止・削除された。
+*   **理由:** Google Drive + GAS 連携による Web App の機能充足により、ローカル SQLite を介した管理の必要性が低下し、シングルソース（Google Drive）によるシンプルな構成とするため。
 
 ## 4. データ構造 (Data Structure)
 Google Drive 上に以下の JSON ファイルを配置し、GAS を介して CRUD 操作を行う。

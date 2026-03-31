@@ -1,6 +1,0 @@
-customtkinter
-matplotlib
-plyer
-reportlab
-markdown
-tkinterweb

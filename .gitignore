@@ -1,19 +1,23 @@
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Database
-*.db
-*.sqlite3
-
 # Logs and temp
 _*.txt
 *.log
+_git_*.txt
+_check_*.txt
+_dep_check_*.txt
 
-# Backups
-backups/
+# Config
+config.json
+.config.json
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
 
 # Environment
 .env

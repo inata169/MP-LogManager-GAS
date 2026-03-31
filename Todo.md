@@ -1,11 +1,12 @@
 # Todo List
 
-## Current Version: v2.0.0 (2026-03-31)
+## Current Version: v2.0.0 (2026-03-31) - Web App Dedicated
 
 ## High Priority (Next Session)
-- [ ] **Desktop版 GAS 連携対応**: `sync_json.py` を改修し、デスクトップ版からも Google Drive データを同期可能にする。
+- [ ] **UI/UX のブラッシュアップ**: GAS 連携の安定性確認と、モバイルでの使い勝手向上。
 
 ## Completed
+- [x] **Web App 専用構成への移行**: デスクトップ版関連ファイルの削除とドキュメントの整理。 (2026-03-31)
 - [x] **Docs Update (GAS v2.0.0 対応)**: 全ドキュメントの記述を GitHub API から GAS 連携仕様へ更新。 (2026-03-31)
 - [x] **GAS + Google Drive 連携への移行**: データを GitHub から Google Drive (GAS) へ安全に移行し、履歴を消去した新規リポジトリ `MP-LogManager-GAS` を構築。 (2026-03-30)
 - [x] **Web Appの汎用化**: 現状 `inata169/MP-LogManager` がハードコードされている箇所を、URLからの自動取得または設定画面での入力式に変更し、誰でもフォークして利用できるように改善。 (2026-03-25)

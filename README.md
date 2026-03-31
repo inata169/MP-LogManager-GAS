@@ -12,10 +12,10 @@
 従来のバージョンとは異なり、**個人のタスクや日報データが GitHub 上に一切保存されません。**
 
 - **データ保存先**: あなたの個人の **Google Drive**
-- **通信ゲートウェイ**: **Google Apps Script (GAS)** を独自のAPIとして使用
-- **GitHub の役割**: プログラム（Web UI/ロジック）の配信のみ
+- **Backend (Storage)**: Google Apps Script (GAS)
+- **Personal Data**: あなたの個人の **Google Drive** にのみ保存されます。
 
-これにより、GitHub リポジトリを Public（公開）設定にして GitHub Pages（iPhone対応）を利用しながらも、**中身のデータは自分だけがアクセスできる安全な場所にある**という、利便性とセキュリティを両立した環境を実現しています。
+これらにより、GitHub リポジトリを 公開 (Public) 設定にして GitHub Pages を利用しながらも、**中身のデータは自分だけがアクセスできる安全な場所にある**という、利便性とセキュリティを両立した環境を実現しています。
 
 ---
 
@@ -40,7 +40,7 @@
    - Google Apps Script (GAS) を作成し、専用のコードをデプロイして「ウェブアプリ URL」を取得。
 
 2. **Web App への設定**
-   - 発行された **GitHub Pages URL**（例: `https://inata169.github.io/MP-LogManager-GAS/web/`）にアクセス。
+   - 発行された **GitHub Pages URL** にアクセス。
    - 右上の設定(⚙️)ボタンから、自分専用の **GAS Web App URL** を入力して保存。
 
 3. **データの復元（移行）**
@@ -49,7 +49,7 @@
 ---
 
 ## 🛠️ 技術スタック
-- **Frontend**: Vanilla JS, CSS3 (Modern dark mode), HTML5
+- **Frontend**: Vanilla JS, CSS3 (Modern dark mode), HTML5 (PWA対応)
 - **Libraries**: EasyMDE, marked.js, highlight.js
 - **Backend**: Google Apps Script (GAS)
 - **Storage**: Google Drive (JSON format)
