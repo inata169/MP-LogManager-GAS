@@ -22,13 +22,13 @@
 ## ✨ 主な機能
 
 ### 📓 Journal (日報・メモ)
-![Journal View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100916.png)
+![Journal View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100838.png)
 - **Rich Editor**: Markdown、シンタックスハイライト、オートセーブ完結。
 - **Secure Storage**: 日々の記録はすべて Google Drive 上の JSON ファイルに保存。
 - **PDF出力**: iPhone の AirPrint や PC での PDF 保存に最適化した整形機能。
 
 ### ✅ Tasks (タスク管理)
-![Tasks View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100838.png)
+![Tasks View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100916.png)
 - **Flexible Management**: カテゴリ、優先度によるタスク管理。
 - **Advanced Sorting**: 期限、作成日によるソートの保存。
 - **Real-time Search**: 全タスクをインクリメンタル検索。
