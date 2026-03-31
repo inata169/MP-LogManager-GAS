@@ -36,6 +36,7 @@
 ## 🔧 セットアップ手順（自分専用の構築）
 
 1. **Google Drive 側の準備**
+   - **[詳細なセットアップガイドはこちら](docs/SETUP_GUIDE.md)** をご覧ください（初心者の方でも迷わず設定できます）。
    - Drive 上に `journals.json` と `tasks.json` を作成。
    - Google Apps Script (GAS) を作成し、専用のコードをデプロイして「ウェブアプリ URL」を取得。
 
