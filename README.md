@@ -1,6 +1,6 @@
 # MP-LogManager (GAS Edition) 🚀
 
-[![Version](https://img.shields.io/badge/version-1.5.0-orange.svg)](https://github.com/inata169/MP-LogManager-GAS)
+[![Version](https://img.shields.io/badge/version-2.0.0-orange.svg)](https://github.com/inata169/MP-LogManager-GAS)
 [![Security](https://img.shields.io/badge/Data%20Privacy-High-green.svg)](https://docs.google.com/presentation/d/...)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 

@@ -1,24 +1,28 @@
 # MP-LogManager API リファレンス
-**Version:** 1.4.1  
-**最終更新:** 2026-03-25
+**Version:** 2.0.0  
+**最終更新:** 2026-03-31
 
 ---
 
 ## 1. Web App API (JavaScript)
-`web/js/api.js` にて不整合のないように実装されている GitHub 通信クラス。
+`web/js/api.js` にて実装されている GAS 通信およびデータ統合管理クラス。
 
-### class `GitHubAPI`
-- **`constructor()`**: `localStorage` から `github_token` を読み込みます。
-- **`setToken(token: string)`**: 新しいトークンを保存し、以降の通信で使用。
-- **`request(endpoint: string, options: any)`**: GitHub REST API へのリクエストをラップ。
-- **`getFile(path: string)`**: ファイル内容と現在の SHA を取得。
-- **`updateFile(path: string, content: any, sha: string, message: string)`**: ファイルを Base64 エンコードして GitHub にプッシュ。
+### class `GasAPI`
+Google Apps Script ウェブアプリ経由で Google Drive 上の JSON を操作します。
+- **`fetchData(type: string)`**: `type` ('tasks' | 'journals') を指定してデータを取得。`fetch` 時にキャッシュ回避用のタイムスタンプを付与します。
+- **`updateData(type: string, data: any)`**: データを POST 送信し、Google Drive 上のファイルを更新します。
+- **`setUrl(url: string)`**: GAS ウェブアプリの URL を `localStorage` に保存。
 
-#### 主要メソッド
-- **`getTasks()`**: `data/tasks.json` を取得。
-- **`updateTasks(tasks, sha)`**: タスクリストを更新。
-- **`getJournals()`**: `data/journals.json` を取得。
-- **`updateJournals(journals, sha)`**: ジャーナルリストを更新。
+### object `DataAPI`
+フロントエンド各画面（Tasks, Journal）から呼ばれる統合インターフェース。
+- **`getTasks()`**: `GasAPI` を使用してタスクリストを取得。
+- **`updateTasks(tasks)`**: タスクリストを保存。
+- **`getJournals()`**: `GasAPI` を使用してジャーナルリストを取得。
+- **`updateJournals(journals)`**: ジャーナルリストを保存。
+
+### class `GitHubAPI` (Legacy/Config)
+リポジトリ設定などの非機密情報の管理に使用可能な、従来の GitHub 通信クラス。
+- **`request(endpoint, options)`**: GitHub REST API へのリクエスト。
 
 ---
 
@@ -29,27 +33,24 @@
 - **class `TaskManager`**:
   - `get_tasks()`: 全タスクをリストで取得。
   - `add_task(...)`: 新規タスクの追加。
-  - `update_status(task_id, status)`: ステータス更新。
 - **class `JournalManager`**:
   - `get_entries(date_str)`: 指定日のジャーナルを取得。
-  - `add_entry(date_str, title, content)`: 新規エントリの作成。
 
 ---
 
-## 3. 同期モジュール (Python)
+## 3. 同期モジュール (Python / 移行準備中)
 ### module `sync_json.py`
-- **`export_to_json()`**: SQLite データベースの内容を `data/*.json` へ書き出し。
-- **`import_from_json()`**: `data/*.json` の内容を SQLite データベースへ読み込み。
-- **`Logger`**: 環境依存の文字化けを回避するためのカスタムロガークラス。
+- **現状**: ローカル SQLite と `data/*.json` (Git 管理) の同期を行います。
+- **予定**: GAS API を介したリモート同期へのアップデートを計画しています。
 
 ---
 
-## 4. ユーティリティ (JavaScript & Python)
+## 4. ユーティリティ
 ### module `utils.py` (Python)
 - **`contains_phi(text)`**: 患者情報の簡易検出正規表現。
 
 ### module `web/js/api.js` (JavaScript)
-- **`getRepoConfig()`**: URL または `localStorage` からリポジトリ情報を自動抽出するユーティリティ。
+- **`getRepoConfig()`**: URL または `localStorage` からリポジトリ情報を抽出。
 
 ---
 **Happy Coding! 🚀**

@@ -1,24 +1,24 @@
 # MP-LogManager 開発者ガイド
-**Version:** 1.4.1  
-**最終更新:** 2026-03-25
+**Version:** 2.0.0  
+**最終更新:** 2026-03-31
 
 ---
 
 ## 1. アーキテクチャ概要
-MP-LogManagerは、**Web App (PWA)** をメインとし、**Desktop App (Python)** がサブとして機能するハイブリッド構成に移行しました。データは GitHub を中央リポジトリとして同期します。
+MP-LogManagerは、**Web App (PWA)** をメインとし、**Google Apps Script (GAS)** をバックエンドとする構成に移行しました。データは GitHub に保存されず、ユーザーの Google Drive 内に JSON 形式で隔離保存されます。
 
 ### 構成要素
 ```
 ┌──────────────────┐          ┌───────────────────┐
-│  Web App (PWA)   │ ◄──────► │  GitHub Repository │
-│  (HTML/JS/CSS)   │   REST   │  (JSON Files)     │
-└──────────────────┘   API    └─────────▲─────────┘
+│  Web App (PWA)   │ ◄──────► │  Google Apps Script│
+│  (HTML/JS/CSS)   │   fetch  │  (GAS API)        │
+└──────────────────┘   (API)  └─────────▲─────────┘
                                         │
-                                        │ git push/pull
+                                        │ read/write
                                         │
                               ┌─────────▼─────────┐
-                              │  Desktop App      │
-                              │  (Python/Tkinter) │
+                              │  Google Drive     │
+                              │  (JSON Files)     │
                               └───────────────────┘
 ```
 
@@ -28,42 +28,42 @@ MP-LogManagerは、**Web App (PWA)** をメインとし、**Desktop App (Python)
 `web/` ディレクトリ内に配置された完全に独立したモジュールです。
 
 ### 主要 JS モジュール
-- **`js/api.js`**: `GitHubAPI` クラスを定義。データの取得・更新（Base64エンコード等）を担当。
-- **`js/app.js`**: 全体初期化、テーマ切り替え、設定モーダル管理。
+- **`js/api.js`**: `GasAPI` クラスおよび `DataAPI` を定義。GAS 経由でのデータ取得・更新を担当。
+- **`js/app.js`**: 全体初期化、テーマ切り替え、設定モーダル（GAS URL入力）管理。
 - **`js/tasks.js`**: タスク表示、フィルタ、並べ替え、保存ロジック。
 - **`js/journal.js`**: EasyMDE初期化、オートセーブ、日付遷移、印刷ロジック。
 
-### PWA とオフライン対応
-- **`sw.js` (Service Worker)**: 各リソース（JS/CSS/HTML）をオフラインでキャッシュ。
-- **`manifest.json`**: アプリケーションアイコン、テーマカラー、開始URLの設定。
-- **リポジトリの相対パス設定**: 様々なリポジトリ名でフォークされても動作するように、各パスは相対パスで定義。
+### PWA とキャッシュ制御
+- **`sw.js` (Service Worker)**: リソースのキャッシュ管理。
+- **キャッシュ破棄**: `fetch` リクエストにタイムスタンプ (`?t=...`) を付与することで、ブラウザのキャッシュを回避し常に最新の JSON を取得します。
 
 ---
 
-## 3. GitHub API 連携
-Web Appは `Personal Access Token (PAT)` を使用し、直接 GitHub と通信します。
+## 3. GAS API 連携
+Web App はユーザー設定の GAS URL に対して GET/POST リクエストを送信します。
 
 ### データ構造
-- `data/tasks.json`: 全タスクデータ。
-- `data/journals.json`: 全ジャーナルデータ。
-- SHA管理: 書き込み時にはファイル内容の更新を検証するため、最新の SHA を常に取得して使用します。
+- `tasks.json`: 全タスクデータ。
+- `journals.json`: 全ジャーナルデータ。
+
+### 通信プロトコル
+- **GET**: `?type=tasks` または `?type=journals` でデータを取得。
+- **POST**: JSON ボディに `type` と `data` を含めてデータを保存。
 
 ---
 
 ## 4. デスクトップ版アプリ (Python)
-デスクトップ版は、ローカルの SQLite3 データベースと GitHub 上の JSON データを同期するブリッジ機能を提供します。
+現状、デスクトップ版はローカルの SQLite3 データベースと **GitHub** 上の JSON を同期する `sync_json.py` を使用しています。
 
-### 同期フロー (`Run_LogManager.bat`)
-1. GitHub から Pull し、最新の JSON を抽出。
-2. JSON から SQLite へデータをインポート。
-3. GUI アプリ（Dashboard 等）が動作。
-4. 終了時に SQLite から JSON をエクスポートし、Git Push。
+### 今後の課題
+- `sync_json.py` を GAS API 対応に改修し、Google Drive 上の JSON と直接同期できるようにする。
+- `config.json` に GAS URL を保存し、`requests` ライブラリ等で通信を行う。
 
 ---
 
 ## 5. 今後の拡張プラン
-- **汎用性の向上**: さらにリポジトリ設定を柔軟にし、GitHub Pages 以外（自前サーバー等）へのデプロイも検討。
-- **セキュリティ**: PAT 以外の認証方式（GitHub Apps等）への移行。
+- **デスクトップ版 GAS 対応**: 同期フローの完全な GAS 化。
+- **セキュリティ**: GAS 上での簡易的な認証トークンの導入。
 
 ---
 **Happy Coding! 🚀**

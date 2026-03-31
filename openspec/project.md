@@ -10,8 +10,9 @@ MP-LogManager は、医学物理士のタスク管理、日報生成、および
 - **Libraries**: EasyMDE (Editor), marked.js (Markdown), highlight.js (Code)
 - **Deployment**: GitHub Pages (PWA対応)
 - **Backend (Storage)**: 
-    - **Google Apps Script (GAS) API**: Google Drive へのデータ保存 (推奨: `MP-LogManager-GAS`)
-    - **GitHub API**: 公開設定ファイルや既存データ用
+    - **Google Apps Script (GAS) API**: Google Drive へのデータ保存 (MP-LogManager-GAS Edition)
+    - **GitHub API**: リポジトリ設定などの非機密情報の管理用
+- **Deployment**: GitHub Pages (PWA対応) - プログラム自体の配信のみを担当
 - **Security**: 個人データ（Journal/Tasks）の GitHub 上への非保存（GAS連携利用時）
 
 ### Desktop App (Sub)
