@@ -30,4 +30,7 @@
 - **一括置換とクリーンアップ**:
   - 全 JS ファイル (`app.js`, `tasks.js`, `journal.js`) から `alert()` を除去し `showToast()` に統合。
   - `Todo.md` / `99-handover_context.md` の更新。
+- **ドキュメントの親切化とビジュアル化**:
+  - **初心者向けセットアップガイド (`docs/SETUP_GUIDE.md`)**: Google Drive/GAS の構築手順を詳述し、READMEからリンク。
+  - **スクリーンショットの追加**: README に実際の Tasks/Journal の操作画面を掲載。
 ---
