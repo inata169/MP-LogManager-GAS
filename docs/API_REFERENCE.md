@@ -1,5 +1,5 @@
 # MP-LogManager API リファレンス
-**Version:** 2.0.0  
+**Version:** 2.1.0  
 **最終更新:** 2026-03-31
 
 ---

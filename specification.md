@@ -1,4 +1,4 @@
-# MP-LogManager (GAS Edition) 仕様書 v2.0
+# MP-LogManager (GAS Edition) 仕様書 v2.1
 
 ## 1. 概要 (Overview)
 *   **プロジェクト名:** MP-LogManager (GAS Edition)

@@ -6,20 +6,18 @@ MP-LogManager は、医学物理士のタスク管理、日報生成、および
 
 ## Tech Stack
 ### Web App (Main)
-- **Framework**: Vanilla JS / HTML5 / CSS3 (Notion-like UI)
+- **Framework**: Vanilla JS / HTML5 / CSS3 (Fixed layout for Mobile/PWA)
 - **Libraries**: EasyMDE (Editor), marked.js (Markdown), highlight.js (Code)
 - **Deployment**: GitHub Pages (PWA対応)
 - **Backend (Storage)**: 
     - **Google Apps Script (GAS) API**: Google Drive へのデータ保存 (MP-LogManager-GAS Edition)
     - **GitHub API**: リポジトリ設定などの非機密情報の管理用
-- **Deployment**: GitHub Pages (PWA対応) - プログラム自体の配信のみを担当
 - **Security**: 個人データ（Journal/Tasks）の GitHub 上への非保存（GAS連携利用時）
+- **Stability**: 通信リトライ、タイムアウト制御、iOS最適化（Safari対応）
 
 ### Desktop App (Sub)
-- **Language**: Python 3.11+
-- **GUI Framework**: CustomTkinter
-- **Database**: SQLite3
-- **Libraries**: pandas (export), matplotlib (charts), reportlab (PDF)
+- **Status**: 廃止 (Ver 2.1.0 移行完了)
+- **Note**: 全機能が Web App + GAS 連携へ統合されました。
 
 ## Project Conventions
 

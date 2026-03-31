@@ -1,4 +1,4 @@
-# Todo List (v2.0.0 - Web App Dedicated)
+# Todo List (v2.1.0 - Web App Dedicated)
 
 - [x] **Task: Web App 専用構成への移行**
     - [x] **デスクトップ版関連ファイルの削除**
