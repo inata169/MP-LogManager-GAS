@@ -223,6 +223,14 @@ const DataAPI = {
     },
     async updateJournals(journals) {
         return await gasAPI.updateData('journals', journals);
+    },
+
+    // Sync
+    async syncCalendar(tasks) {
+        return await gasAPI.updateData('sync_calendar', tasks);
+    },
+    async syncGTasks(tasks) {
+        return await gasAPI.updateData('sync_gtasks', tasks);
     }
 };
 

@@ -18,6 +18,7 @@
 ---
 
 ## 🚀 High Priority (Next)
+- [x] **Google 同期機能の実装**: Google Calendar (予定) および Google Tasks (Todo) との同期機能（一方向）を実装。設定画面で個別に ON/OFF 可能。 (2026-04-01)
 - [x] **UI/UX のブラッシュアップ**: GAS 連携の安定性向上（リトライ・タイムアウト・ping）と、モバイル・iOSでの使い勝手向上（トースト・SafeArea・ズーム防止）。
 
 ## 📜 Completed Archive

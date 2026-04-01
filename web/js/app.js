@@ -110,6 +110,8 @@ function initModals() {
         const token = document.getElementById('github-token').value.trim();
         const owner = document.getElementById('github-owner').value.trim();
         const repo = document.getElementById('github-repo').value.trim();
+        const syncCalendar = document.getElementById('sync-calendar-toggle').checked;
+        const syncGTasks = document.getElementById('sync-gtasks-toggle').checked;
 
         if (!gasUrl) {
             showToast('GAS Web App URL を入力してください', 'error');
@@ -118,6 +120,9 @@ function initModals() {
 
         gasAPI.setUrl(gasUrl);
         if (token) githubAPI.setToken(token);
+        
+        localStorage.setItem('sync_calendar', syncCalendar);
+        localStorage.setItem('sync_gtasks', syncGTasks);
 
         // Owner/Repoを保存（空の場合は削除して自動取得に任せる）
         if (owner) {
@@ -277,6 +282,8 @@ function initSettings() {
         document.getElementById('github-token').value = localStorage.getItem('github_token') || '';
         document.getElementById('github-owner').value = localStorage.getItem('github_owner') || '';
         document.getElementById('github-repo').value = localStorage.getItem('github_repo') || '';
+        document.getElementById('sync-calendar-toggle').checked = localStorage.getItem('sync_calendar') === 'true';
+        document.getElementById('sync-gtasks-toggle').checked = localStorage.getItem('sync_gtasks') === 'true';
 
         showModal('settings-modal');
     });

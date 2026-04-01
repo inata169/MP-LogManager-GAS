@@ -201,6 +201,21 @@ async function saveTasks() {
         if (result.content && result.content.sha) {
             tasksSha = result.content.sha;
         }
+
+        // Google 同期
+        try {
+            if (localStorage.getItem('sync_calendar') === 'true') {
+                console.log('Syncing to Google Calendar...');
+                DataAPI.syncCalendar(tasksData); // 非同期で投げておく (no-cors)
+            }
+            if (localStorage.getItem('sync_gtasks') === 'true') {
+                console.log('Syncing to Google Tasks...');
+                DataAPI.syncGTasks(tasksData); // 非同期で投げておく (no-cors)
+            }
+        } catch (syncErr) {
+            console.warn('Sync failed (will not block save):', syncErr);
+        }
+
         renderTasks();
     } catch (error) {
         console.error('Failed to save tasks:', error);

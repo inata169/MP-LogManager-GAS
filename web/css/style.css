@@ -925,6 +925,56 @@ body {
 .help-text a {
     color: var(--primary-color);
 }
+/* Toggle Switch Styles */
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.switch-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+}
+
+.switch-label input {
+    display: none;
+}
+
+.switch-label .slider {
+    position: relative;
+    display: inline-flex;
+    width: 50px;
+    height: 26px;
+    background-color: var(--bg-tertiary);
+    border-radius: 34px;
+    transition: .4s;
+}
+
+.switch-label .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.switch-label input:checked + .slider {
+    background-color: var(--success-color);
+}
+
+.switch-label input:checked + .slider:before {
+    transform: translateX(22px);
+}
 
 /* ===== Loading ===== */
 .loading {

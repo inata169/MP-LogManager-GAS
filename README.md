@@ -31,7 +31,8 @@
 ![Tasks View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100916.png)
 - **Flexible Management**: カテゴリ、優先度によるタスク管理。
 - **Advanced Sorting**: 期限、作成日によるソートの保存。
-- **Real-time Search**: 全タスクをインクリメンタル検索。
+- **Real-time Search**: 全タスクを複数キーワードで検索。
+- **Google Sync**: Google カレンダー（予定）および Google Tasks (Todo) との自動同期。
 
 ---
 

@@ -187,6 +187,27 @@
                     <input type="text" id="github-repo" class="input" placeholder="MP-LogManager">
                 </div>
 
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+
+                <h3>Google 同期設定</h3>
+                <div class="settings-group">
+                    <div class="setting-item">
+                        <label class="switch-label">
+                            <span>Google Calendar 同期</span>
+                            <input type="checkbox" id="sync-calendar-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="switch-label">
+                            <span>Google Tasks 同期</span>
+                            <input type="checkbox" id="sync-gtasks-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <p class="help-text">タスク保存時に Google カレンダーや Google Todo と自動同期します。</p>
+
             </div>
             <div class="modal-footer">
                 <button id="test-gas-connection" class="btn btn-secondary">接続テスト</button>
