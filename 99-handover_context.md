@@ -1,8 +1,9 @@
 # Handover Context (2026-03-31 更新)
 ## 📌 現在のステータス
-v2.1.0 (GAS Edition) 安定性向上版。デスクトップ版 (Python) 関連を完全に廃止し、**Web App 専用リポジトリ** への移行が完了、モバイル運用を強化しました。
+v2.2.0 (GAS Edition) Google 同期版。Google Calendar と Google Tasks (Todo) との自動同期機能を追加しました。
 ### ✅ 実装/完了済み
 - **Web App Dedicated**: デスクトップ版関連ファイルおよびドキュメント内の言及をすべて削除。
+- **v2.2.0 Release**: Google Calendar および Google Tasks との同期機能（一方向）の実装。
 - **v2.1.0 Release**: 安定性向上（リトライ、タイムアウト）とモバイルUX（トースト、iOSズーム防止）の向上。
 - **Google Sync Implementation**: Google Calendar および Google Tasks との同期機能（一方向）を実装。手順書 (`docs/GOOGLE_SYNC_SETUP.md`) も作成・充実化。
 - **v2.0.0 Release**: GAS 連携を標準としたメジャーアップデートの完了。
