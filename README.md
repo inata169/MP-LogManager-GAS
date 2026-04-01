@@ -24,7 +24,7 @@
 ### 📓 Journal (日報・メモ)
 ![Journal View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100838.png)
 - **Rich Editor**: Markdown、シンタックスハイライト、オートセーブ完結。
-- **Secure Storage**: 日々の記録はすべて Google Drive 上の JSON ファイルに保存。
+- **Secure Storage**: 日々の記録はすべて Google Drive 上上の JSON ファイルに保存。
 - **PDF出力**: iPhone の AirPrint や PC での PDF 保存に最適化した整形機能。
 
 ### ✅ Tasks (タスク管理)
@@ -39,7 +39,8 @@
 ## 🔧 セットアップ手順（自分専用の構築）
 
 1. **Google Drive 側の準備**
-   - **[詳細なセットアップガイドはこちら](docs/SETUP_GUIDE.md)** をご覧ください（初心者の方でも迷わず設定できます）。
+   - **[詳細なセットアップガイドはこちら](docs/SETUP_GUIDE.md)** をご覧ください。
+   - **[Google 同期（カレンダー・Todo）の設定はこちら](docs/GOOGLE_SYNC_SETUP.md)** をご覧ください。
    - Drive 上に `journals.json` と `tasks.json` を作成。
    - Google Apps Script (GAS) を作成し、専用のコードをデプロイして「ウェブアプリ URL」を取得。
 
