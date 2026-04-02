@@ -198,6 +198,13 @@ async function deleteTask(taskId) {
     if (!confirm('このタスクを削除しますか？')) return;
 
     tasksData = tasksData.filter(t => t.id !== taskId);
+    
+    // カレンダー同期設定がONで日付がないものが含まれる場合、警告を表示するためのチェック用
+    const noDateSyncTasks = tasksData.filter(t => t.sync_calendar !== false && !t.due_date && t.status !== 'DONE');
+    if (noDateSyncTasks.length > 0 && localStorage.getItem('sync_calendar') === 'true') {
+        console.warn('Tasks without due date will not sync to Google Calendar:', noDateSyncTasks);
+    }
+
     await saveTasks();
 }
 
@@ -210,6 +217,12 @@ async function saveTasks() {
         const result = await DataAPI.updateTasks(tasksData);
         if (result.content && result.content.sha) {
             tasksSha = result.content.sha;
+        }
+
+        // [v2.2.5] 日付なしタスクへの警告
+        const noDateSyncTasks = tasksData.filter(t => t.sync_calendar !== false && !t.due_date && t.status !== 'DONE');
+        if (noDateSyncTasks.length > 0 && localStorage.getItem('sync_calendar') === 'true') {
+            showToast(`${noDateSyncTasks.length}件のタスクに日付がないため、Calendarには同期されません。`, 'warning', 5000);
         }
 
         /* [Optimization] クォータ節約のため自動同期を一時停止。手動同期ボタンを使用してください。

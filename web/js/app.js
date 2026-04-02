@@ -4,7 +4,7 @@
 
 // アプリ初期化
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('MP-LogManager Web App v20260321 loading...');
+    console.log('MP-LogManager Web App v2.2.5 (Optimization & Fix) loading...');
     initTheme();
     initNavigation();
     initModals();
@@ -363,22 +363,30 @@ function initSync() {
             
             if (localStorage.getItem('sync_calendar') === 'true') {
                 console.log('Manual sync: Calendar...');
-                syncResults.push(DataAPI.syncCalendar(tasksData));
+                syncResults.push(DataAPI.syncCalendar(tasksData).then(r => ({ type: 'Calendar', ...r })));
             }
             if (localStorage.getItem('sync_gtasks') === 'true') {
                 console.log('Manual sync: GTasks...');
-                syncResults.push(DataAPI.syncGTasks(tasksData));
+                syncResults.push(DataAPI.syncGTasks(tasksData).then(r => ({ type: 'Tasks', ...r })));
             }
 
             if (syncResults.length === 0) {
                 showToast('同期設定がオフになっています', 'warning');
             } else {
-                await Promise.all(syncResults);
-                showToast('Google 同期が完了しました', 'success');
+                const results = await Promise.all(syncResults);
+                let message = 'Google 同期が完了しました';
+                results.forEach(res => {
+                    if (res.updated !== undefined) {
+                        message += `\n- ${res.type}: ${res.updated}件`;
+                    } else if (res.status === 'requested (fallback)' || res.status === 'cors_blocked') {
+                        message += `\n- ${res.type}: 通信不安定（要カレンダー確認）`;
+                    }
+                });
+                showToast(message, 'success', 5000);
             }
         } catch (error) {
             console.error('Manual sync failed:', error);
-            showToast(`同期失敗: ${error.message}`, 'error');
+            showToast(`同期失敗: ${error.message}\n(GASの承認が必要な場合があります)`, 'error', 6000);
         } finally {
             animation.cancel();
         }

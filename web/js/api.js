@@ -88,22 +88,43 @@ class GasAPI {
         if (!this.hasUrl()) throw new Error('GAS URLが設定されていません');
 
         try {
-            // POST は失敗時の副作用を考慮し、通常のリトライではなく timeout のみ適用
+            // 診断で CORS OK だったため、mode: 'cors' を試行してレスポンスを受け取れるようにする
             const response = await this.fetchWithTimeout(this.url, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'cors', // no-cors から変更してレスポンスを読み取れるようにする
                 headers: {
-                    'Content-Type': 'text/plain'
+                    'Content-Type': 'text/plain' // GAS doPost は text/plain で受け取るのが安定
                 },
                 body: JSON.stringify({
                     type: type,
                     data: data
                 })
-            }, 15000); // 更新は少し長めに待機 (15s)
+            }, 15000);
 
-            return { status: 'requested' };
+            if (!response.ok) {
+                // CORS で失敗した場合は no-cors で再試行（フォールバック）
+                console.warn(`POST cors failed (${response.status}), retrying with no-cors...`);
+                await this.fetchWithTimeout(this.url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ type: type, data: data })
+                }, 15000);
+                return { status: 'requested (fallback)' };
+            }
+
+            const result = await response.json();
+            if (result && result.error) {
+                throw new Error(`GAS Error: ${result.error}`);
+            }
+            return result;
         } catch (error) {
             console.error(`UpdateData failed (${type}):`, error);
+            // エラー時も最小限の情報を返す
+            if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                // おそらく CORS ブロック
+                return { status: 'cors_blocked', message: 'CORSによりレスポンスを読み取れません。GASの権限承認を確認してください。' };
+            }
             throw error;
         }
     }
