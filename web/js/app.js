@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initModals();
     initRefresh();
     initSettings();
+    initSync();
 
     // GAS URL確認
     if (!gasAPI.hasUrl()) {
@@ -151,22 +152,57 @@ function initModals() {
         }
 
         const btn = document.getElementById('test-gas-connection');
+        const diagResult = document.getElementById('connection-diag-result');
         const originalText = btn.textContent;
+        
         btn.textContent = 'テスト中...';
         btn.disabled = true;
+        diagResult.style.display = 'block';
+        diagResult.innerHTML = '<div class="diag-loading">診断中...</div>';
 
         const tempApi = new GasAPI();
         tempApi.setUrl(gasUrl);
 
         try {
-            const success = await tempApi.ping();
-            if (success) {
+            const result = await tempApi.diagnose();
+            
+            let html = `<h4>診断結果</h4><ul class="diag-list">`;
+            results.steps.forEach(step => {
+                const statusClass = step.status === 'OK' ? 'diag-ok' : 'diag-fail';
+                html += `
+                    <li>
+                        <span class="diag-step-name">${step.name}</span>
+                        <span class="diag-step-status ${statusClass}">${step.status}</span>
+                        ${step.error ? `<div class="diag-error">${step.error}</div>` : ''}
+                        ${step.hint ? `<div class="diag-hint">${step.hint}</div>` : ''}
+                    </li>`;
+            });
+            
+            // DataAPIの直近エラーも表示
+            if (DataAPI.lastError) {
+                html += `
+                    <li class="diag-last-error">
+                        <span class="diag-step-name">Last Operations Error</span>
+                        <div class="diag-error">
+                            [${DataAPI.lastError.timestamp}] ${DataAPI.lastError.message}
+                        </div>
+                    </li>`;
+            }
+            
+            html += `</ul>`;
+            
+            if (result.ok) {
+                html += `<div class="diag-summary success">✅ 接続に成功しました。設定を保存してリロードしてください。</div>`;
                 showToast('接続成功！', 'success');
             } else {
-                showToast('接続に失敗しました。URLまたはGASの公開設定を確認してください。', 'error');
+                html += `<div class="diag-summary error">❌ 接続に失敗しました。GASのデプロイ設定（アクセス権: 全員）やクォータ制限を確認してください。</div>`;
+                showToast('接続失敗', 'error');
             }
+            
+            diagResult.innerHTML = html;
         } catch (e) {
-            showToast('エラーが発生しました', 'error');
+            diagResult.innerHTML = `<div class="diag-summary error">重大なエラー: ${e.message}</div>`;
+            showToast(`エラー: ${e.message}`, 'error');
         } finally {
             btn.textContent = originalText;
             btn.disabled = false;
@@ -290,3 +326,61 @@ function initSettings() {
 }
 
 
+
+/**
+ * 同期機能初期化
+ */
+function initSync() {
+    const syncBtn = document.getElementById('sync-btn');
+    if (!syncBtn) return;
+
+    // 設定で両方OFFならボタンを無効化（または非表示）
+    const isSyncEnabled = localStorage.getItem('sync_calendar') === 'true' || localStorage.getItem('sync_gtasks') === 'true';
+    if (!isSyncEnabled) {
+        syncBtn.style.opacity = '0.5';
+        syncBtn.title = '設定でGoogle同期がオフになっています';
+    }
+
+    syncBtn.addEventListener('click', async () => {
+        if (!gasAPI.hasUrl()) {
+            showToast('GAS URLを設定してください', 'warning');
+            return;
+        }
+
+        const icon = syncBtn.querySelector('.icon');
+        // 回転アニメーション開始
+        const animation = icon.animate([
+            { transform: 'rotate(0deg)' },
+            { transform: 'rotate(360deg)' }
+        ], {
+            duration: 1000,
+            iterations: Infinity
+        });
+
+        try {
+            showToast('Google と同期中...', 'info');
+            const syncResults = [];
+            
+            if (localStorage.getItem('sync_calendar') === 'true') {
+                console.log('Manual sync: Calendar...');
+                syncResults.push(DataAPI.syncCalendar(tasksData));
+            }
+            if (localStorage.getItem('sync_gtasks') === 'true') {
+                console.log('Manual sync: GTasks...');
+                syncResults.push(DataAPI.syncGTasks(tasksData));
+            }
+
+            if (syncResults.length === 0) {
+                showToast('同期設定がオフになっています', 'warning');
+            } else {
+                await Promise.all(syncResults);
+                showToast('Google 同期が完了しました', 'success');
+            }
+        } catch (error) {
+            console.error('Manual sync failed:', error);
+            showToast(`同期失敗: ${error.message}`, 'error');
+        } finally {
+            animation.cancel();
+        }
+    });
+}

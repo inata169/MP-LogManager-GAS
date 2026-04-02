@@ -12,13 +12,20 @@ let currentEditingTaskId = null;
 async function loadTasks() {
     try {
         showLoading(true);
-        const { tasks, sha } = await DataAPI.getTasks();
+        const { tasks, sha, isCache, error } = await DataAPI.getTasks();
         tasksData = tasks || [];
         tasksSha = sha;
         renderTasks();
+
+        if (isCache) {
+            showToast(`オフラインまたは接続エラーのため、キャッシュデータを表示しています (${error})`, 'warning', 6000);
+            document.getElementById('app-main').classList.add('cache-mode');
+        } else {
+            document.getElementById('app-main').classList.remove('cache-mode');
+        }
     } catch (error) {
         console.error('Failed to load tasks:', error);
-        showToast('タスクの読み込みに失敗しました。URLの設定を確認してください。', 'error');
+        showToast(`タスクの読み込みに失敗しました: ${error.message}`, 'error');
     } finally {
         showLoading(false);
     }
@@ -202,7 +209,7 @@ async function saveTasks() {
             tasksSha = result.content.sha;
         }
 
-        // Google 同期
+        /* [Optimization] クォータ節約のため自動同期を一時停止。手動同期ボタンを使用してください。
         try {
             if (localStorage.getItem('sync_calendar') === 'true') {
                 console.log('Syncing to Google Calendar...');
@@ -215,6 +222,7 @@ async function saveTasks() {
         } catch (syncErr) {
             console.warn('Sync failed (will not block save):', syncErr);
         }
+        */
 
         renderTasks();
     } catch (error) {

@@ -21,6 +21,9 @@
     <header class="app-header">
         <h1>MP-LogManager</h1>
         <div class="header-actions">
+            <button id="sync-btn" class="icon-btn" aria-label="Sync with Google">
+                <span class="icon">☁️</span>
+            </button>
             <button id="refresh-btn" class="icon-btn" aria-label="Refresh data">
                 <span class="icon">🔄</span>
             </button>
@@ -35,6 +38,11 @@
 
     <!-- Main Content -->
     <main id="app-main">
+        <!-- Cache Warning Banner -->
+        <div class="cache-warning">
+            ⚠️ 現在オフラインまたは取得エラーのため、最後に成功したキャッシュを表示しています。
+        </div>
+
         <!-- Tasks View -->
         <div id="tasks-view" class="view active">
             <div class="view-header">
@@ -206,8 +214,7 @@
                         </label>
                     </div>
                 </div>
-                <p class="help-text">タスク保存時に Google カレンダーや Google Todo と自動同期します。</p>
-
+                <div id="connection-diag-result" class="diag-result" style="display: none;"></div>
             </div>
             <div class="modal-footer">
                 <button id="test-gas-connection" class="btn btn-secondary">接続テスト</button>

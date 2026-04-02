@@ -1,21 +1,43 @@
-# Google 同期機能セットアップガイド
+# Google 同期機能セットアップガイド (v2.2.1 最適化版)
 
-Google カレンダーおよび Google Tasks (Todo) と同期するために、以下の手順で GAS スクリプトを更新してください。
+Google カレンダーおよび Google Tasks (Todo) と同期するために、以下の手順で GAS スクリプトを更新してください。本バージョンでは **クォータ制限（API呼び出し制限）対策** が施されており、動作がより安定しています。
 
 ## 1. Google Tasks API の有効化 (必須)
 
-1. [script.google.com](https://script.google.com/) で `MP-LogManager API` を開きます。
-2. 左メニューの **[サービス +]** をクリックします。
-3. 一覧から **[Google Tasks API]** を選択し、**[追加]** をクリックします。
-   - ※ これを行わないと、Tasks 同期時にエラーが発生します。
+以前のバージョンより設定が簡単になりました。マニフェストファイル (`appsscript.json`) を直接編集することで、確実かつ迅速に API を有効化できます。
 
-> [!TIP]
-> **より簡単な方法**: リポジトリ内の `web/gas-api-template.json` を [Google Apps Script 拡張機能](https://chrome.google.com/webstore/detail/google-apps-script-github/pnbnnebhneidfacpbedhkocakebneboc) や Clasp 等でインポートすることも可能ですが、基本は以下の手動設定を推奨します。
+1.  GAS エディタの画面左端にある **歯車アイコン（プロジェクトの設定）** をクリックします。
+2.  「**『appsscript.json』マニフェストファイルをエディタに表示する**」という項目にチェックを入れます。
+3.  画面左端の **「<>」（エディタ）アイコン** に戻ります。
+4.  ファイル名のリストに `appsscript.json` が現れるので、それを開き、中身を以下のように書き換えて保存（Ctrl+S）してください。
+
+```json
+{
+  "timeZone": "Asia/Tokyo",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Tasks",
+        "version": "v1",
+        "serviceId": "tasks"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "ANYONE_ANONYMOUS"
+  }
+}
+```
+
+---
 
 ## 2. Code.gs の更新
 
 現在の `Code.gs` の内容をすべて消去し、以下を貼り付けてください。
-(以前のファイルID `journals` と `tasks` の値は、現在のあなたの環境に合わせて自動構成してあります)
+**※重要**: `YOUR_JOURNALS_FILE_ID` などの値は、ご自身の環境のものに書き換えてください。
 
 ```javascript
 /* --- 設定: あなたのファイルID --- */
@@ -29,19 +51,15 @@ const FILES = {
  */
 function doGet(e) {
   const type = e.parameter.type;
-  
   if (type === 'ping') return createResponse({ status: 'ok' });
-
-  if (!FILES[type]) {
-    return createResponse({ error: "Invalid type" });
-  }
+  if (!FILES[type]) return createResponse({ error: 'Invalid type' });
 
   try {
     const file = DriveApp.getFileById(FILES[type]);
     const content = file.getBlob().getDataAsString();
-    return createResponse(JSON.parse(content || "[]"));
+    return createResponse(JSON.parse(content || '[]'));
   } catch (err) {
-    return createResponse({ error: "File access error: " + err.toString() });
+    return createResponse({ error: 'File access error: ' + err.toString() });
   }
 }
 
@@ -54,73 +72,69 @@ function doPost(e) {
     const type = postData.type;
     const data = postData.data;
 
-    // 通常のデータ保存
     if (FILES[type]) {
       const file = DriveApp.getFileById(FILES[type]);
       file.setContent(JSON.stringify(data, null, 2));
-      return createResponse({ status: "success" });
+      return createResponse({ status: 'success' });
     }
 
-    // Google Calendar 同期
-    if (type === 'sync_calendar') {
-      return createResponse(syncCalendar(data));
-    }
+    if (type === 'sync_calendar') return createResponse(syncCalendar(data));
+    if (type === 'sync_gtasks') return createResponse(syncGTasks(data));
 
-    // Google Tasks 同期
-    if (type === 'sync_gtasks') {
-      return createResponse(syncGTasks(data));
-    }
-
-    return createResponse({ error: "Invalid type" });
+    return createResponse({ error: 'Invalid type' });
   } catch (err) {
-    return createResponse({ error: "Post error: " + err.toString() });
+    return createResponse({ error: 'Post error: ' + err.toString() });
   }
 }
 
 /**
- * Google Calendar 同期ロジック
+ * Google Calendar 同期ロジック (最適化版)
  */
 function syncCalendar(tasks) {
   const calendar = CalendarApp.getDefaultCalendar();
-  const prefix = "[MP-Log]";
-  
-  // 30日前から365日後までの既存イベントを取得して重複防止
+  const prefix = '[MP-Log]';
   const now = new Date();
   const start = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
   const end = new Date(now.getTime() + (365 * 24 * 60 * 60 * 1000));
   const existingEvents = calendar.getEvents(start, end, { search: prefix });
 
+  const processedIds = new Set();
+
   tasks.forEach(task => {
     if (!task.due_date || task.status === 'DONE') return;
 
     const title = `${prefix} ${task.title}`;
-    const dueDate = new Date(task.due_date);
+    const startDate = new Date(task.due_date);
     
-    // 既存チェック
-    const existing = existingEvents.find(e => e.getTitle().includes(task.title));
-    
+    const existing = existingEvents.find(e => e.getTitle() === title);
+
     if (existing) {
-      // 日付が違えば更新
-      if (existing.getAllDayStartDate().getTime() !== dueDate.getTime()) {
-        existing.setAllDayDate(dueDate);
+      processedIds.add(existing.getId());
+      if (existing.getAllDayStartDate().getTime() !== startDate.getTime()) {
+        existing.setAllDayDate(startDate);
       }
     } else {
-      // 新規作成
-      calendar.createAllDayEvent(title, dueDate, { description: task.details || "" });
+      const newEvent = calendar.createAllDayEvent(title, startDate, { description: task.details || '' });
+      processedIds.add(newEvent.getId());
     }
   });
 
-  return { status: "calendar_synced" };
+  // クリーンアップ: リストにないイベントを削除
+  existingEvents.forEach(e => {
+    if (!processedIds.has(e.getId())) {
+      e.deleteEvent();
+    }
+  });
+
+  return { status: 'calendar_synced', updated: tasks.length };
 }
 
 /**
- * Google Tasks 同期ロジック
+ * Google Tasks 同期ロジック (最適化版)
  */
 function syncGTasks(tasks) {
-  const listName = "MP-LogManager";
+  const listName = 'MP-LogManager';
   let taskListId = null;
-
-  // リストの取得または作成
   const lists = Tasks.Tasklists.list().items;
   const existingList = lists ? lists.find(l => l.title === listName) : null;
 
@@ -131,69 +145,69 @@ function syncGTasks(tasks) {
     taskListId = newList.id;
   }
 
-  // 既存タスクの取得
-  const existingTasks = Tasks.Tasks.list(taskListId).items || [];
+  const gTasksItems = Tasks.Tasks.list(taskListId).items || [];
+  const processedGIds = new Set();
 
   tasks.forEach(task => {
-    const status = task.status === 'DONE' ? 'completed' : 'needsAction';
-    const existing = existingTasks.find(t => t.title === task.title);
+    if (task.status === 'DONE') return;
 
-    const taskResource = {
-      title: task.title,
-      notes: task.details || "",
-      status: status
-    };
-    
-    if (task.due_date) {
-      // ISO 8601 形式の文字列が必要
-      taskResource.due = new Date(task.due_date).toISOString();
-    }
+    const existing = gTasksItems.find(t => t.title === task.title);
+    const status = 'needsAction';
+    const notes = task.details || '';
+    const due = task.due_date ? new Date(task.due_date).toISOString() : null;
 
     if (existing) {
-      Tasks.Tasks.patch(taskResource, taskListId, existing.id);
-    } else if (task.status !== 'DONE') {
-      Tasks.Tasks.insert(taskResource, taskListId);
+      processedGIds.add(existing.id);
+      const hasChange = (existing.notes || '') !== notes || 
+                        (existing.due || '').split('T')[0] !== (due || '').split('T')[0];
+      
+      if (hasChange) {
+        Tasks.Tasks.patch({ notes: notes, due: due, status: status }, taskListId, existing.id);
+      }
+    } else {
+      const newTask = Tasks.Tasks.insert({ title: task.title, notes: notes, due: due, status: status }, taskListId);
+      processedGIds.add(newTask.id);
     }
   });
 
-  return { status: "gtasks_synced" };
+  // クリーンアップ: リストにないタスクを完了にする
+  gTasksItems.forEach(gt => {
+    if (gt.status !== 'completed' && !processedGIds.has(gt.id)) {
+      Tasks.Tasks.patch({ status: 'completed' }, taskListId, gt.id);
+    }
+  });
+
+  return { status: 'gtasks_synced', updated: tasks.length };
 }
 
 function createResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
 }
 ```
 
+---
+
 ## 3. デプロイ（反映作業）
 
-ここが最も重要なステップです。**正しく「新しいバージョン」を作成しないと、プログラムの変更が反映されません。**
+プログラムの変更を有効にするために、必ず「新しいデプロイ」を行ってください。
 
-1.  GAS エディタ右上の **[デプロイ]** -> **[デプロイを管理]** をクリックします。
-2.  現在のアクティブなデプロイ（例: `MP-LogManager API` または `無題`）を選択します。
-3.  右上の **鉛筆アイコン（編集）** をクリックします。
-4.  「バージョン」のプルダウンメニューをクリックし、**必ず [新しいバージョン] を選択してください。**
-    - ※ ここで「バージョン 1」などの既存の数字のままだと、中身が更新されません。
-5.  右下の **[デプロイ]** ボタンをクリックします。
-6.  「デプロイを更新しました」と表示され、バージョン番号が上がっていれば（例: バージョン 3）成功です。
-    - ※ Web App URL は原則変わりませんので、Web アプリ側の設定を直す必要はありません。
-
----
-
-## 4. 実行権限の承認（同期が動かない場合）
-
-もし上記設定をしても同期されない場合は、GAS にカレンダーや Todo を操作する権限が与えられていない可能性があります。
-
-1.  GAS エディタのツールバーにある「実行する関数を選択」から **`syncCalendar`** および **`syncGTasks`** をそれぞれ選び、**[▶ 実行]** を押します。
-2.  **「承認が必要です」** というポップアップが出たら、画面の指示に従って自分のアカウントで「許可」を行ってください。
-    - ※ 両方の関数を 1 度ずつ実行（許可）することで、カレンダーと Todo 両方の権限が確定します。
-3.  一度許可すれば、それ以降は自動で同期されるようになります。
+1.  GAS エディタ右上の **[デプロイ]** ボタンをクリックします。
+2.  **[新しいデプロイ]** を選択します。
+3.  種類の選択が「ウェブアプリ」であることを確認し、「説明」に `v2.2.1 最適化版` などと入力します。
+4.  「アクセスできるユーザー」を必ず「**全員 (Anyone)**」に設定します。
+5.  **[デプロイ]** をクリックします。
+6.  完了画面に表示される **「ウェブアプリ URL」をコピー** します。
+7.  MP-LogManager アプリの設定（⚙️）を開き、新しくコピーした URL を貼り付けて保存してください。
 
 ---
 
-## 5. Web アプリ側での動作確認
+## 4. 手動同期の使い方 (v2.2.1 新機能)
 
-1.  Web アプリ（GitHub Pages）をリロードします。
-2.  設定（⚙️）を開き、**「Google 同期設定」** の各スイッチを **ON** にして **[保存]** を押します。
-3.  タスクを新規作成し、**「期限（日）」** を入力して保存してください。
-4.  自分の Google カレンダーと Google Todo（MP-LogManager リスト）に反映されれば完了です！
+本バージョンより、クォータ（API制限）を節約するため、自動同期ではなく**手動同期モード**が標準となりました。
+
+1.  タスクの編集やチェックが終わったら、ヘッダー（画面右上）にある **クラウドアイコン ☁️（同期ボタン）** をクリックします。
+2.  アイコンが回転し、同期が開始されます。成功すると「Google 同期が完了しました」と表示されます。
+3.  これにより、1日に何度も API を呼び出すことを防ぎ、動作の安定性を高めています。
+
+> [!IMPORTANT]
+> **「承認が必要です」と表示された場合**: 手動で `syncCalendar` などを実行して許可を与えるか、デプロイ時に求められる承認フローを画面の指示に従って完了させてください。

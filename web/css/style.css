@@ -100,6 +100,32 @@ body {
     margin-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
     padding: 20px;
     min-height: calc(100vh - var(--header-height) - var(--bottom-nav-height) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cache Warning Banner */
+.cache-warning {
+    display: none;
+    background-color: var(--warning-color);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: var(--shadow);
+    animation: slideDown 0.3s ease-out;
+}
+
+#app-main.cache-mode .cache-warning {
+    display: block;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .view {
@@ -1136,3 +1162,69 @@ body {
     from { opacity: 1; }
     to { opacity: 0; }
 }
+
+/* ===== Diagnostics ===== */
+.diag-result {
+    margin-top: 15px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+}
+
+.diag-result h4 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.diag-list {
+    list-style: none;
+    padding: 0;
+}
+
+.diag-list li {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.diag-step-name {
+    font-weight: 500;
+}
+
+.diag-step-status {
+    float: right;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.diag-ok { background: var(--success-color); color: white; }
+.diag-fail { background: var(--danger-color); color: white; }
+
+.diag-error {
+    color: var(--danger-color);
+    font-family: monospace;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    word-break: break-all;
+}
+
+.diag-hint {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.diag-summary {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.diag-summary.success { background: rgba(80, 200, 120, 0.1); color: var(--success-color); }
+.diag-summary.error { background: rgba(255, 107, 107, 0.1); color: var(--danger-color); }

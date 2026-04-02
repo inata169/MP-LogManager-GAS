@@ -68,10 +68,18 @@ class GasAPI {
         try {
             // 指数バックオフを伴うリトライを適用
             const response = await this.fetchWithRetry(`${this.url}?type=${type}&t=${Date.now()}`);
-            if (!response.ok) throw new Error(`GAS API Error: ${response.status}`);
-            return response.json();
+            if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+            
+            const data = await response.json();
+            if (data && data.error) {
+                throw new Error(`GAS Error: ${data.error}`);
+            }
+            return data;
         } catch (error) {
             console.error(`FetchData failed (${type}):`, error);
+            if (error.message === 'Failed to fetch') {
+                throw new Error('ネットワークエラーまたはGASのクォータ制限により、データ取得に失敗しました。');
+            }
             throw error;
         }
     }
@@ -100,18 +108,64 @@ class GasAPI {
         }
     }
 
-    /**
-     * GASへの疎通確認
-     */
     async ping() {
-        if (!this.hasUrl()) return false;
+        if (!this.hasUrl()) return { ok: false, error: 'URL未設定' };
         try {
-            // 短いタイムアウトで接続確認
             const response = await this.fetchWithTimeout(`${this.url}?type=ping&t=${Date.now()}`, {}, 5000);
-            return response.ok;
+            if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+            
+            const data = await response.json();
+            if (data && data.error) return { ok: false, error: data.error };
+            return { ok: true };
         } catch (e) {
-            return false;
+            let msg = e.message;
+            if (e.name === 'AbortError') msg = 'タイムアウト (5秒)';
+            
+            // クォータ超過や一般的なGASエラーの推測
+            if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+                msg = 'ネットワークエラーまたはクォータ制限の可能性があります';
+            }
+            
+            console.error('Ping failed:', e);
+            return { ok: false, error: msg, details: e.stack };
         }
+    }
+
+    /**
+     * 詳細な診断を実行 (mode: 'cors' を試走)
+     */
+    async diagnose() {
+        if (!this.hasUrl()) return { ok: false, error: 'URL未設定' };
+        
+        const results = {
+            url: this.url,
+            steps: []
+        };
+
+        // Step 1: Normal Ping (no-cors)
+        results.steps.push({ name: 'Basic Connectivity (no-cors)', status: 'testing...' });
+        const pingResult = await this.ping();
+        results.steps[0].status = pingResult.ok ? 'OK' : 'Failed';
+        results.steps[0].error = pingResult.error;
+
+        // Step 2: CORS Check (may fail by design, but gives info)
+        results.steps.push({ name: 'CORS Diagnostic (cors)', status: 'testing...' });
+        try {
+            const response = await this.fetchWithTimeout(`${this.url}?type=ping&t=${Date.now()}`, {
+                mode: 'cors'
+            }, 5000);
+            results.steps[1].status = response.ok ? 'OK' : `HTTP ${response.status}`;
+        } catch (e) {
+            results.steps[1].status = 'Blocked/Error';
+            results.steps[1].error = e.message;
+            if (e.name === 'TypeError' && e.message === 'Failed to fetch') {
+                results.steps[1].hint = 'CORS制約またはURLが無効です（GASのWebアプリ設定を確認してください）';
+            }
+        }
+
+        // Step 3: Quota/Response Check (via Proxy if possible, but here we just check if it was ever successful)
+        results.ok = pingResult.ok;
+        return results;
     }
 
     /**
@@ -207,30 +261,83 @@ const gasAPI = new GasAPI();
  * データの統合取得・更新関数（フロントエンドからはこれを呼ぶ）
  */
 const DataAPI = {
+    // キャッシュユーティリティ
+    _setCache(key, data) {
+        localStorage.setItem(`cache_${key}`, JSON.stringify({
+            data,
+            timestamp: Date.now()
+        }));
+    },
+    _getCache(key) {
+        const cached = localStorage.getItem(`cache_${key}`);
+        return cached ? JSON.parse(cached) : null;
+    },
+    
+    lastError: null,
+    
+    _setLastError(error) {
+        this.lastError = {
+            message: error.message,
+            timestamp: new Date().toISOString(),
+            stack: error.stack
+        };
+        console.error('DataAPI Error logged:', error);
+    },
+
     // Tasks
     async getTasks() {
-        const data = await gasAPI.fetchData('tasks');
-        return { tasks: data, sha: null }; // GASではSHA不要
+        try {
+            const data = await gasAPI.fetchData('tasks');
+            this._setCache('tasks', data);
+            return { tasks: data, sha: null, isCache: false };
+        } catch (error) {
+            this._setLastError(error);
+            const cached = this._getCache('tasks');
+            if (cached) {
+                console.warn('Using cached tasks due to error:', error);
+                return { tasks: cached.data, sha: null, isCache: true, error: error.message };
+            }
+            throw error;
+        }
     },
     async updateTasks(tasks) {
-        return await gasAPI.updateData('tasks', tasks);
+        const result = await gasAPI.updateData('tasks', tasks);
+        this._setCache('tasks', tasks); // 更新成功(リクエスト送信)時もキャッシュを更新
+        return result;
     },
 
     // Journals
     async getJournals() {
-        const data = await gasAPI.fetchData('journals');
-        return { journals: data, sha: null };
+        try {
+            const data = await gasAPI.fetchData('journals');
+            this._setCache('journals', data);
+            return { journals: data, sha: null, isCache: false };
+        } catch (error) {
+            this._setLastError(error);
+            const cached = this._getCache('journals');
+            if (cached) {
+                console.warn('Using cached journals due to error:', error);
+                return { journals: cached.data, sha: null, isCache: true, error: error.message };
+            }
+            throw error;
+        }
     },
     async updateJournals(journals) {
-        return await gasAPI.updateData('journals', journals);
+        const result = await gasAPI.updateData('journals', journals);
+        this._setCache('journals', journals);
+        return result;
     },
 
     // Sync
     async syncCalendar(tasks) {
-        return await gasAPI.updateData('sync_calendar', tasks);
+        // [Optimization] 完了済みタスクは同期対象から除外してクォータを節約
+        const activeTasks = tasks.filter(t => t.status !== 'DONE');
+        return await gasAPI.updateData('sync_calendar', activeTasks);
     },
     async syncGTasks(tasks) {
-        return await gasAPI.updateData('sync_gtasks', tasks);
+        // [Optimization] 同様にフィルタリング
+        const activeTasks = tasks.filter(t => t.status !== 'DONE');
+        return await gasAPI.updateData('sync_gtasks', activeTasks);
     }
 };
 

@@ -15,13 +15,18 @@ let saveDraftTimeout = null;
 async function loadJournals() {
     try {
         showLoading(true);
-        const { journals, sha } = await DataAPI.getJournals();
+        const { journals, sha, isCache, error } = await DataAPI.getJournals();
         journalsData = journals || [];
         journalsSha = sha;
         renderJournals();
+
+        if (isCache) {
+            // Tasks側と重複を避けるため、ここではクラス付与のみ行う
+            document.getElementById('app-main').classList.add('cache-mode');
+        }
     } catch (error) {
         console.error('Failed to load journals:', error);
-        showToast('Journalの読み込みに失敗しました。URLの設定を確認してください。', 'error');
+        showToast(`Journalの読み込みに失敗しました: ${error.message}`, 'error');
     } finally {
         showLoading(false);
     }

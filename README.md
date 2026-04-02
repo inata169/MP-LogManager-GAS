@@ -1,6 +1,6 @@
 # MP-LogManager (GAS Edition) 🚀
 
-[![Version](https://img.shields.io/badge/version-2.2.0-orange.svg)](https://github.com/inata169/MP-LogManager-GAS)
+[![Version](https://img.shields.io/badge/version-2.2.1-orange.svg)](https://github.com/inata169/MP-LogManager-GAS)
 [![Security](https://img.shields.io/badge/Data%20Privacy-High-green.svg)](https://docs.google.com/presentation/d/...)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -24,15 +24,13 @@
 ### 📓 Journal (日報・メモ)
 ![Journal View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100838.png)
 - **Rich Editor**: Markdown、シンタックスハイライト、オートセーブ完結。
-- **Secure Storage**: 日々の記録はすべて Google Drive 上上の JSON ファイルに保存。
 - **PDF出力**: iPhone の AirPrint や PC での PDF 保存に最適化した整形機能。
 
 ### ✅ Tasks (タスク管理)
 ![Tasks View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100916.png)
-- **Flexible Management**: カテゴリ、優先度によるタスク管理。
-- **Advanced Sorting**: 期限、作成日によるソートの保存。
+- **Flexible Management**: カテゴリ、優先度、期限によるタスク管理。
 - **Real-time Search**: 全タスクを複数キーワードで検索。
-- **Google Sync**: Google カレンダー（予定）および Google Tasks (Todo) との自動同期。
+- **Google Sync (v2.2.1 Optimized)**: Google カレンダーおよび Google Tasks (Todo) との同期機能。クォータ制約を考慮した「手動同期ボタン」による安定運用が可能。
 
 ---
 
@@ -41,21 +39,19 @@
 1. **Google Drive 側の準備**
    - **[詳細なセットアップガイドはこちら](docs/SETUP_GUIDE.md)** をご覧ください。
    - **[Google 同期（カレンダー・Todo）の設定はこちら](docs/GOOGLE_SYNC_SETUP.md)** をご覧ください。
-   - Drive 上に `journals.json` と `tasks.json` を作成。
-   - Google Apps Script (GAS) を作成し、専用のコードをデプロイして「ウェブアプリ URL」を取得。
+   - GAS 側で `appsscript.json` を編集して Tasks API を有効にする必要があります。
 
 2. **Web App への設定**
    - 発行された **GitHub Pages URL** にアクセス。
    - 右上の設定(⚙️)ボタンから、自分専用の **GAS Web App URL** を入力して保存。
 
-3. **データの復元（移行）**
-   - 既存のデータがある場合は、Google Drive 上の JSON ファイルに中身をコピーすることでそのまま引き継げます。
+3. **データの復旧・移行**
+   - Google Drive 上の JSON ファイルを直接編集することでバックアップや移行が可能です。
 
 ---
 
 ## 🛠️ 技術スタック
 - **Frontend**: Vanilla JS, CSS3 (Modern dark mode), HTML5 (PWA対応)
-- **Libraries**: EasyMDE, marked.js, highlight.js
 - **Backend**: Google Apps Script (GAS)
 - **Storage**: Google Drive (JSON format)
 
