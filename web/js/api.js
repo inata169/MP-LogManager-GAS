@@ -330,9 +330,9 @@ const DataAPI = {
 
     // Sync
     async syncCalendar(tasks) {
-        // [Optimization] 完了済みタスクは同期対象から除外してクォータを節約
-        const activeTasks = tasks.filter(t => t.status !== 'DONE');
-        return await gasAPI.updateData('sync_calendar', activeTasks);
+        // [Optimization] 個別に同期OFF設定されているタスク、および完了済みタスクを除外
+        const syncTasks = tasks.filter(t => t.sync_calendar !== false && t.status !== 'DONE');
+        return await gasAPI.updateData('sync_calendar', syncTasks);
     },
     async syncGTasks(tasks) {
         // [Optimization] 同様にフィルタリング

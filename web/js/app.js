@@ -167,7 +167,7 @@ function initModals() {
             const result = await tempApi.diagnose();
             
             let html = `<h4>診断結果</h4><ul class="diag-list">`;
-            results.steps.forEach(step => {
+            result.steps.forEach(step => {
                 const statusClass = step.status === 'OK' ? 'diag-ok' : 'diag-fail';
                 html += `
                     <li>

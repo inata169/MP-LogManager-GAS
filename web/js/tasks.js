@@ -130,6 +130,7 @@ function openAddTaskModal() {
     document.getElementById('task-priority').value = 'Medium';
     document.getElementById('task-due-date').value = '';
     document.getElementById('task-details').value = '';
+    document.getElementById('task-sync-calendar').checked = true; // デフォルトはON
     showModal('task-modal');
 }
 
@@ -147,6 +148,7 @@ function openEditTaskModal(taskId) {
     document.getElementById('task-priority').value = task.priority;
     document.getElementById('task-due-date').value = task.due_date || '';
     document.getElementById('task-details').value = task.details || '';
+    document.getElementById('task-sync-calendar').checked = task.sync_calendar !== false; // 明示的に false でなければ ON
     showModal('task-modal');
 }
 
@@ -165,7 +167,8 @@ async function saveTask() {
         category: document.getElementById('task-category').value,
         priority: document.getElementById('task-priority').value,
         due_date: document.getElementById('task-due-date').value || null,
-        details: document.getElementById('task-details').value.trim() || null
+        details: document.getElementById('task-details').value.trim() || null,
+        sync_calendar: document.getElementById('task-sync-calendar').checked
     };
 
     if (currentEditingTaskId) {

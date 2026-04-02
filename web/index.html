@@ -158,6 +158,12 @@
                 </select>
                 <input type="date" id="task-due-date" class="input">
                 <textarea id="task-details" class="input textarea" placeholder="詳細"></textarea>
+                <div class="modal-options" style="margin-top: 10px; padding: 5px;">
+                    <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                        <input type="checkbox" id="task-sync-calendar" checked style="width: 18px; height: 18px;">
+                        Google カレンダーに同期する
+                    </label>
+                </div>
             </div>
             <div class="modal-footer">
                 <button id="save-task" class="btn btn-primary">保存</button>
@@ -235,10 +241,10 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js?v=20260227"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
-    <script src="js/api.js?v=20260326"></script>
-    <script src="js/tasks.js?v=20260326"></script>
-    <script src="js/journal.js?v=20260326"></script>
-    <script src="js/app.js?v=20260326"></script>
+    <script src="js/api.js?v=2.2.4"></script>
+    <script src="js/tasks.js?v=2.2.4"></script>
+    <script src="js/journal.js?v=2.2.4"></script>
+    <script src="js/app.js?v=2.2.4"></script>
 
     <!-- 印刷用エリア (通常は非表示) -->
     <div id="print-area" class="print-only">
