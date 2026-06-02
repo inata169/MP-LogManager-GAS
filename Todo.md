@@ -1,5 +1,13 @@
 # Todo List (v2.2.4 - Optimization & Feature Edition / 途中経過)
 
+- [x] **Journal 高密度レスポンシブレイアウト (v2.3.0) [完了]** (2026-06-02)
+    - [x] **OpenSpec 提案作成**: `add-compact-responsive-layout` を作成し、Journal の情報密度改善要件を定義。
+    - [x] **PC 横幅活用**: Journal/Tasks のコンテンツ領域を最大 1480px まで拡張し、中央寄せの余白を削減。
+    - [x] **iPhone 表示圧縮**: ヘッダー、下部ナビ、検索欄、Journal カード、EasyMDE 周辺の余白を削減。
+    - [x] **Journal 一覧トグル**: モバイル編集中は一覧と検索を畳み、`List` / `Edit` で切り替え可能に変更。
+    - [x] **キャッシュ更新**: CSS/JS のクエリと Service Worker キャッシュを `v2.3.0` に更新。
+    - [x] **検証**: `openspec validate`、`node --check`、ローカルブラウザ確認、ユーザー確認済み。
+
 - [x] **個別タスクの同期設定と不具合修正 (v2.2.4) [完了]** (2026-04-02)
     - [x] **個別同期フラグの追加**: チェックボックスの実装と保存処理
     - [x] **PWA アイコンの復旧**: 404エラー対策としてのアイコン画像配置
