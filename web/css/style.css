@@ -1228,3 +1228,239 @@ body {
 
 .diag-summary.success { background: rgba(80, 200, 120, 0.1); color: var(--success-color); }
 .diag-summary.error { background: rgba(255, 107, 107, 0.1); color: var(--danger-color); }
+
+/* ===== Compact Responsive Layout ===== */
+.compact-only {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    #app-main {
+        width: min(100%, 1480px);
+        margin-left: auto;
+        margin-right: auto;
+        padding: 16px 28px;
+    }
+
+    .view-header,
+    .filter-bar {
+        max-width: none;
+    }
+
+    .filter-bar {
+        margin-bottom: 16px;
+    }
+
+    .journal-layout-container {
+        gap: 16px;
+        min-height: calc(100vh - var(--header-height) - var(--bottom-nav-height) - 150px);
+    }
+
+    .journal-sidebar {
+        flex: 0 0 340px;
+        max-width: 380px;
+    }
+
+    .journal-editor {
+        flex: 1 1 auto;
+    }
+
+    .CodeMirror:not(.CodeMirror-fullscreen):not(.CodeMirror-sided),
+    .editor-preview:not(.editor-preview-full):not(.editor-preview-side) {
+        height: calc(100vh - 285px);
+        min-height: 520px;
+    }
+}
+
+@media (max-width: 600px) {
+    :root {
+        --header-height: 48px;
+        --bottom-nav-height: 56px;
+    }
+
+    body {
+        line-height: 1.45;
+    }
+
+    .app-header {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .app-header h1 {
+        font-size: 1.2rem;
+        line-height: 1.05;
+        max-width: 118px;
+        overflow: hidden;
+    }
+
+    .header-actions {
+        gap: 2px;
+    }
+
+    .icon-btn {
+        min-width: 36px;
+        min-height: 36px;
+        padding: 4px;
+        font-size: 1.15rem;
+        border-radius: 6px;
+    }
+
+    #app-main {
+        padding: 10px;
+    }
+
+    .view-header {
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .view-header h2 {
+        font-size: 1.55rem;
+        line-height: 1.1;
+    }
+
+    .date-nav {
+        gap: 6px;
+    }
+
+    .date-input {
+        padding: 7px 9px;
+        font-size: 0.95rem;
+    }
+
+    .compact-only {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #journal-list-toggle {
+        width: 100%;
+        margin: 0 0 8px 0;
+        padding: 7px 10px;
+        font-size: 0.9rem;
+    }
+
+    #journal-view.entry-active:not(.list-open) .filter-bar,
+    #journal-view.entry-active:not(.list-open) .journal-sidebar {
+        display: none;
+    }
+
+    .filter-bar {
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .search-input {
+        padding: 9px 12px;
+        border-radius: 8px;
+    }
+
+    .journal-layout-container {
+        gap: 10px;
+    }
+
+    .journal-entry {
+        padding: 11px 12px;
+        margin-bottom: 8px;
+        border-radius: 10px;
+    }
+
+    .journal-entry-title {
+        font-size: 1rem;
+    }
+
+    .journal-entry-preview {
+        font-size: 0.82rem;
+    }
+
+    #journal-entries {
+        max-height: 170px;
+    }
+
+    .journal-editor {
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .journal-title-input {
+        padding: 9px 10px;
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+
+    .editor-toolbar:not(.fullscreen) {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 3px;
+        gap: 1px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .editor-toolbar a {
+        min-width: 30px;
+        height: 30px;
+        line-height: 30px;
+        flex: 0 0 auto;
+    }
+
+    .editor-toolbar i.separator {
+        height: 24px;
+        margin: 3px 2px;
+        flex: 0 0 auto;
+    }
+
+    .CodeMirror {
+        padding: 6px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .CodeMirror:not(.CodeMirror-fullscreen):not(.CodeMirror-sided),
+    .editor-preview:not(.editor-preview-full):not(.editor-preview-side) {
+        height: calc(100dvh - var(--header-height) - var(--bottom-nav-height) - 210px);
+        min-height: 430px;
+    }
+
+    .editor-preview {
+        padding: 9px;
+    }
+
+    .editor-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .editor-actions .btn {
+        padding: 9px 6px;
+        min-height: 44px;
+        font-size: 0.9rem;
+        line-height: 1.2;
+    }
+
+    .bottom-nav {
+        height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+    }
+
+    .nav-btn {
+        gap: 1px;
+        padding: 6px;
+    }
+
+    .nav-icon {
+        font-size: 1.25rem;
+    }
+
+    .nav-label {
+        font-size: 0.72rem;
+    }
+
+    .toast-container {
+        bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 8px);
+    }
+}

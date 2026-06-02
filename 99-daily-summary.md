@@ -1,3 +1,30 @@
+# 日次サマリー - 2026-06-02
+## Journal 高密度レスポンシブレイアウト v2.3.0
+2か月の実利用で判明した「PCブラウザ版・iPhoneブラウザ版ともに画面内の情報量が少ない」という課題に対応しました。今回は特に Journal 画面を優先し、本文を読む・書く領域を広げる方向で UI を圧縮しました。
+
+### 実装・対応内容
+- **OpenSpec 提案の作成**:
+  - `openspec/changes/add-compact-responsive-layout/` を作成し、PC/iPhone 両方で Journal の作業領域を増やす要件を定義しました。
+- **PC 版の横幅活用**:
+  - `#app-main` を最大 1480px まで広げ、Journal の一覧とエディタが横方向の余白を活用できるようにしました。
+- **iPhone 版の縦方向圧縮**:
+  - ヘッダー、下部ナビ、日付操作、検索欄、Journal カード、エディタ外枠、EasyMDE ツールバーの余白を削減しました。
+  - EasyMDE ツールバーは横スクロール1段を基本とし、本文領域を圧迫しにくくしました。
+- **Journal 一覧トグル**:
+  - モバイル編集中は検索欄とエントリ一覧を畳み、`List` / `Edit` ボタンで切り替えられるようにしました。
+- **PWA キャッシュ更新**:
+  - `index.html` の CSS/JS クエリを `v=2.3.0` に更新し、`sw.js` の `CACHE_NAME` を `mp-logmanager-gas-v2-3-0` に更新しました。
+
+### 検証
+- `openspec.cmd validate add-compact-responsive-layout --strict --no-interactive`: 成功。
+- `node --check web/js/journal.js`: 成功。
+- ローカルサーバー `http://localhost:8787/` で表示確認。
+- ユーザーによる in-app browser 確認で「いい感じ」と評価、OpenSpec タスク完了済み。
+
+### 次の候補
+- Tasks 画面も同じ思想で高密度化し、PC/iPhone の一覧表示件数を増やす。
+- Journal のヘッダー周辺をさらに整理し、日付・List/Edit・保存操作をより少ない面積にまとめる。
+
 # 日次サマリー - 2026-03-30
 ## 🚀 Google Drive + GAS 連携への移行と履歴のクリーンアップ
 個人データの流出リスクを完全に排除するため、GitHub API に依存しない Google Drive + Google Apps Script (GAS) 連携構成への抜本的な移行を実施しました。

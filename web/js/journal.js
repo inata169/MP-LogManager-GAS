@@ -8,6 +8,25 @@ let currentDate = new Date().toISOString().split('T')[0];
 let currentEditingEntryId = null;
 let easyMDE = null;
 let saveDraftTimeout = null;
+let isJournalListOpen = false;
+
+function updateJournalLayoutState() {
+    const view = document.getElementById('journal-view');
+    const toggle = document.getElementById('journal-list-toggle');
+    if (!view) return;
+
+    view.classList.toggle('entry-active', Boolean(currentEditingEntryId));
+    view.classList.toggle('list-open', isJournalListOpen);
+
+    if (toggle) {
+        toggle.textContent = isJournalListOpen ? 'Edit' : 'List';
+        toggle.setAttribute('aria-pressed', String(isJournalListOpen));
+    }
+
+    if (easyMDE) {
+        setTimeout(() => easyMDE.codemirror.refresh(), 0);
+    }
+}
 
 /**
  * Journals読み込み
@@ -54,6 +73,7 @@ function renderJournals() {
     if (entries.length === 0) {
         container.innerHTML = `<p style="color: var(--text-secondary); text-align: center;">${searchQuery ? '検索結果が見つかりません' : 'この日のエントリはありません'}</p>`;
         if (!searchQuery) clearEditor();
+        updateJournalLayoutState();
         return;
     }
 
@@ -74,6 +94,8 @@ function renderJournals() {
     // 最初のエントリを自動選択 (検索時以外または以前の選択がない場合)
     if (!currentEditingEntryId && entries.length > 0) {
         loadJournalEntry(entries[0].id);
+    } else {
+        updateJournalLayoutState();
     }
 }
 
@@ -85,6 +107,7 @@ function loadJournalEntry(entryId) {
     if (!entry) return;
 
     currentEditingEntryId = entryId;
+    isJournalListOpen = false;
     document.getElementById('journal-title').value = entry.title;
     if (easyMDE) {
         easyMDE.value(entry.content);
@@ -96,6 +119,7 @@ function loadJournalEntry(entryId) {
     document.querySelectorAll('.journal-entry').forEach(el => {
         el.classList.toggle('active', parseInt(el.dataset.id) === entryId);
     });
+    updateJournalLayoutState();
 }
 
 /**
@@ -109,6 +133,7 @@ function clearEditor() {
     } else {
         document.getElementById('journal-content').value = '';
     }
+    updateJournalLayoutState();
 }
 
 /**
@@ -116,7 +141,9 @@ function clearEditor() {
  */
 function createNewEntry() {
     clearEditor();
+    isJournalListOpen = false;
     document.getElementById('journal-title').value = 'Daily Log';
+    updateJournalLayoutState();
     if (easyMDE) {
         easyMDE.codemirror.focus();
     } else {
@@ -191,6 +218,7 @@ function changeDate(days) {
     currentDate = date.toISOString().split('T')[0];
     document.getElementById('journal-date').value = currentDate;
     currentEditingEntryId = null;
+    isJournalListOpen = false;
     renderJournals();
 }
 
@@ -200,6 +228,7 @@ function changeDate(days) {
 function onDateChange() {
     currentDate = document.getElementById('journal-date').value;
     currentEditingEntryId = null;
+    isJournalListOpen = false;
     renderJournals();
 }
 
@@ -296,6 +325,8 @@ function checkDraft() {
             document.getElementById('journal-title').value = draft.title;
             easyMDE.value(draft.content);
             currentEditingEntryId = draft.entryId;
+            isJournalListOpen = false;
+            updateJournalLayoutState();
         } else {
             localStorage.removeItem('journal_draft');
         }
@@ -322,6 +353,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('save-journal').addEventListener('click', saveJournal);
     document.getElementById('print-journal').addEventListener('click', printJournal);
     document.getElementById('new-entry').addEventListener('click', createNewEntry);
+    const listToggle = document.getElementById('journal-list-toggle');
+    if (listToggle) {
+        listToggle.addEventListener('click', () => {
+            isJournalListOpen = !isJournalListOpen;
+            updateJournalLayoutState();
+        });
+    }
     
     if (typeof EasyMDE !== 'undefined') {
         easyMDE = new EasyMDE({
@@ -377,6 +415,7 @@ async function deleteJournalEntry(event, entryId) {
         journalsData = journalsData.filter(j => j.id !== entryId);
         
         if (currentEditingEntryId === entryId) {
+            isJournalListOpen = true;
             clearEditor();
         }
         
