@@ -1,3 +1,35 @@
+# 日次サマリー - 2026-06-03
+## Tasks 高密度レスポンシブレイアウト v2.3.1 / README 更新
+Journal 高密度化に続き、Tasks 画面も PC/iPhone の両方で一覧性を高める方向に調整しました。あわせて、PC 幅で Journal が広がらない原因だった共通 `max-width: 800px` 制限を修正し、公開反映と README スクリーンショット更新まで完了しました。
+
+### 実装・対応内容
+- **Tasks 画面の高密度化**:
+  - PC では検索/フィルタ領域を横並びにし、タスクカードを2〜3カラム表示に変更しました。
+  - iPhone では検索欄、フィルタ、カード余白、バッジ、詳細プレビューを圧縮しました。
+- **Journal/Tasks 共通の横幅制限修正**:
+  - `@media (min-width: 768px)` の `#app-main { max-width: 800px; }` が 1024px 以上でも残っていたため、1024px 以上では `max-width: 1480px` を明示して上書きしました。
+- **PWA キャッシュ更新**:
+  - `index.html` の CSS/JS クエリを `v=2.3.1` に更新し、`sw.js` の `CACHE_NAME` を `mp-logmanager-gas-v2-3-1` に更新しました。
+- **README 更新**:
+  - version badge を `2.3.1` に更新しました。
+  - iPhone 版 Journal / Tasks の最新スクリーンショットを `docs/pics/mobile-*.png` として追加し、README では横並び表示にしました。
+
+### 検証
+- `node --check web/js/journal.js`: 成功。
+- `node --check web/js/tasks.js`: 成功。
+- ユーザー確認により、GitHub Pages / ローカルで `style.css?v=2.3.1` 読み込み、PC 最大幅の Journal 拡張、Tasks 2〜3カラム、iPhone 幅の Tasks/Journal 表示を確認済み。
+- 公開 URL から README、GitHub Pages HTML、CSS を直接取得し、`v=2.3.1`、`max-width: 1480px`、Tasks グリッド指定の反映を確認済み。
+
+### Git
+- `6981595 Improve compact responsive Tasks layout`
+- `8539fa0 Update README screenshots for v2.3.1`
+- `9327c5a Display README screenshots side by side`
+- 上記はいずれも `origin/main` へ push 済み。
+
+### 次の候補
+- モバイル Journal の Markdown 表示で、太字や装飾が大きく見える箇所のフォントサイズ・行間調整。
+- PWA のオフライン通知やアイコンのブラッシュアップ。
+
 # 日次サマリー - 2026-06-02
 ## Journal 高密度レスポンシブレイアウト v2.3.0
 2か月の実利用で判明した「PCブラウザ版・iPhoneブラウザ版ともに画面内の情報量が少ない」という課題に対応しました。今回は特に Journal 画面を優先し、本文を読む・書く領域を広げる方向で UI を圧縮しました。

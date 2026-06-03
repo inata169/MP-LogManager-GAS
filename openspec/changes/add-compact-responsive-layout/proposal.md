@@ -8,7 +8,9 @@ Two months of real-world use showed that both PC browser and iPhone browser view
 - Expand Journal and Tasks content width on PC browsers.
 - Compact the mobile header, bottom navigation, Journal controls, and EasyMDE editor chrome.
 - Prioritize Journal editor content on iPhone while keeping entry navigation usable.
+- Compact the Tasks list, search/filter controls, and task metadata density on PC and iPhone.
+- Update README screenshots to show the compact mobile Journal and Tasks layouts.
 
 ## Impact
 - Affected specs: `journal-layout`
-- Affected code: `web/css/style.css`, optionally `web/js/journal.js`
+- Affected code: `web/css/style.css`, `web/index.html`, `web/js/journal.js`, `web/sw.js`, `README.md`, `docs/pics/*`
