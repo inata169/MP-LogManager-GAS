@@ -21,14 +21,16 @@
 
 ## ✨ 主な機能
 
+| Journal | Tasks |
+| --- | --- |
+| <img src="docs/pics/mobile-journal-v2.3.1.png" alt="Journal View" width="300"> | <img src="docs/pics/mobile-tasks-v2.3.1.png" alt="Tasks View" width="300"> |
+
 ### 📓 Journal (日報・メモ)
-![Journal View](docs/pics/mobile-journal-v2.3.1.png)
 - **Rich Editor**: Markdown、シンタックスハイライト、オートセーブ完結。
 - **Compact Layout**: PC/iPhone の両方で本文領域を広く使える高密度レイアウト。
 - **PDF出力**: iPhone の AirPrint や PC での PDF 保存に最適化した整形機能。
 
 ### ✅ Tasks (タスク管理)
-![Tasks View](docs/pics/mobile-tasks-v2.3.1.png)
 - **Flexible Management**: カテゴリ、優先度、期限によるタスク管理。
 - **Real-time Search**: 全タスクを複数キーワードで検索。
 - **Dense Task List**: PC では複数カラム、iPhone では省スペース表示で一覧性を向上。
