@@ -1,6 +1,6 @@
 # MP-LogManager (GAS Edition) 🚀
 
-[![Version](https://img.shields.io/badge/version-2.2.5-orange.svg)](https://github.com/inata169/MP-LogManager-GAS)
+[![Version](https://img.shields.io/badge/version-2.3.1-orange.svg)](https://github.com/inata169/MP-LogManager-GAS)
 [![Security](https://img.shields.io/badge/Data%20Privacy-High-green.svg)](https://docs.google.com/presentation/d/...)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -22,14 +22,16 @@
 ## ✨ 主な機能
 
 ### 📓 Journal (日報・メモ)
-![Journal View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100838.png)
+![Journal View](docs/pics/mobile-journal-v2.3.1.png)
 - **Rich Editor**: Markdown、シンタックスハイライト、オートセーブ完結。
+- **Compact Layout**: PC/iPhone の両方で本文領域を広く使える高密度レイアウト。
 - **PDF出力**: iPhone の AirPrint や PC での PDF 保存に最適化した整形機能。
 
 ### ✅ Tasks (タスク管理)
-![Tasks View](docs/pics/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-03-31%20100916.png)
+![Tasks View](docs/pics/mobile-tasks-v2.3.1.png)
 - **Flexible Management**: カテゴリ、優先度、期限によるタスク管理。
 - **Real-time Search**: 全タスクを複数キーワードで検索。
+- **Dense Task List**: PC では複数カラム、iPhone では省スペース表示で一覧性を向上。
 - **Google Sync (v2.2.5 Optimized)**: Google カレンダーおよび Google Tasks (Todo) との同期機能。**※重要: 初回利用時に GAS 側での「承認（手動実行）」が必要です。**
 
 ---
