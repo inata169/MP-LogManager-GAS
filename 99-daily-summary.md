@@ -9,7 +9,7 @@ v2.3.2-r5 was prepared as a small follow-up release for Calendar sync diagnostic
 - Confirmed Service Worker cache name is `mp-logmanager-gas-v2-3-2-r5`.
 - Added `RELEASE_NOTES_v2.3.2-r5.md`.
 - Confirmed the `v2.3.2-r5` GitHub Release was created manually.
-- Archived OpenSpec change `improve-save-load-mobile-task-sync` and created live specs for `data-performance`, `google-sync`, and `mobile-task-ux`.
+- Archived completed OpenSpec changes and created live specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, `mobile-task-ux`, and `task-management`.
 
 ### r5 Constraints
 - No JSON schema or top-level data structure changes.
@@ -20,6 +20,7 @@ v2.3.2-r5 was prepared as a small follow-up release for Calendar sync diagnostic
 
 ### r5 Verification
 - `openspec validate --specs --strict --no-interactive`
+- `openspec list` now leaves only `add-google-sync` active because it still has incomplete tasks.
 
 ## v2.3.2 Release Completed
 v2.3.2 was completed, validated, tagged, and released. This release stayed intentionally low risk: diagnostics and UX only, with no JSON schema changes, no top-level data structure changes, no GAS API contract changes, and no Calendar sync semantic changes.
