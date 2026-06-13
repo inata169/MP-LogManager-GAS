@@ -1401,8 +1401,13 @@ body {
     }
 
     #task-details {
-        min-height: 30vh;
-        max-height: 45vh;
+        height: 42dvh;
+        min-height: 260px;
+        max-height: 52dvh;
+    }
+
+    #task-modal .modal-content {
+        height: calc(100dvh - 24px);
     }
 
     .view-header {

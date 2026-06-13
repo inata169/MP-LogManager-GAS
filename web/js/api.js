@@ -478,3 +478,13 @@ gasAPI.updateData = async function(type, data) {
         throw error;
     }
 };
+
+DataAPI.syncCalendar = async function(tasks) {
+    const syncTasks = tasks.filter(t => t.sync_calendar !== false && t.status !== 'DONE');
+    return await gasAPI.updateData('sync_calendar', syncTasks);
+};
+
+DataAPI.syncGTasks = async function(tasks) {
+    const activeTasks = tasks.filter(t => t.status !== 'DONE');
+    return await gasAPI.updateData('sync_gtasks', activeTasks);
+};
