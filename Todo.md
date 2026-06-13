@@ -9,6 +9,10 @@
   - [x] Documented Windows/PowerShell UTF-8 precautions.
   - [x] Removed merged cleanup branches locally and from `origin`.
 
+- [x] **Google sync spec per-task opt-out follow-up** (2026-06-13)
+  - [x] Updated the current Google sync spec to preserve per-task Calendar opt-out behavior.
+  - [x] Verified `openspec validate --specs --strict --no-interactive`.
+
 - [x] **v2.3.2-r5 Calendar diagnostic styling follow-up** (2026-06-13)
   - [x] Changed readable-but-unverified Calendar sync diagnostics to informational feedback instead of success feedback.
   - [x] Kept fallback/CORS/unreadable Calendar sync diagnostics as warnings.

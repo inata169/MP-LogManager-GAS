@@ -20,7 +20,7 @@ The Web App SHALL distinguish basic GAS connectivity from actual Google Calendar
 
 ### Requirement: Google Calendar 同期設定
 The Web App SHALL allow users to turn Google Calendar sync ON or OFF in settings.
-When Calendar sync is ON, manual sync SHALL send eligible non-DONE tasks to GAS as default-calendar all-day event sync requests.
+When Calendar sync is ON, manual sync SHALL send eligible non-DONE tasks with per-task Calendar sync enabled to GAS as default-calendar all-day event sync requests.
 
 #### Scenario: 同期 ON で手動同期
 - **WHEN** ユーザーが Google Calendar 同期設定を ON にして手動同期ボタンを押す
@@ -37,6 +37,10 @@ When Calendar sync is ON, manual sync SHALL send eligible non-DONE tasks to GAS 
 #### Scenario: 期限なしタスクの診断
 - **WHEN** Google Calendar 同期が ON で期限のない未完了タスクがある
 - **THEN** the Web App informs the user that those tasks are skipped because Calendar events require due dates.
+
+#### Scenario: タスク単位の Calendar 同期 OFF
+- **WHEN** Google Calendar 同期が ON で、ある未完了タスクの Calendar 同期がタスク単位で OFF になっている
+- **THEN** that task is excluded from the `sync_calendar` request.
 
 ### Requirement: Google Tasks 同期設定
 The Web App SHALL allow users to turn Google Tasks sync ON or OFF in settings.

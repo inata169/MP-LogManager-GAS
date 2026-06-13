@@ -44,6 +44,12 @@ Added `docs/DEV_SETUP.md` to document per-PC setup for Git, Node.js LTS, GitHub 
 - Confirmed `.codex-tools/` remains ignored in `.gitignore`.
 - Checked merged cleanup branches were removed locally and from `origin`.
 
+## Google Sync Spec Follow-up
+Updated the live Google sync spec to preserve the deployed per-task Calendar opt-out behavior: tasks with `sync_calendar === false` remain excluded from manual Calendar sync even when the global Calendar sync setting is ON.
+
+### Google Sync Spec Verification
+- `openspec validate --specs --strict --no-interactive`
+
 ## v2.3.2 Release Completed
 v2.3.2 was completed, validated, tagged, and released. This release stayed intentionally low risk: diagnostics and UX only, with no JSON schema changes, no top-level data structure changes, no GAS API contract changes, and no Calendar sync semantic changes.
 
