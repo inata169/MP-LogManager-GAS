@@ -192,8 +192,8 @@ function initModals() {
             html += `</ul>`;
             
             if (result.ok) {
-                html += `<div class="diag-summary success">GAS ping OK. This confirms basic GAS connectivity only; Calendar sync still requires a manual sync check.</div>`;
-                showToast('GAS ping OK. Calendar sync is not verified yet.', 'success', 5000);
+                html += `<div class="diag-summary info">GAS ping OK. This only confirms basic connectivity; Calendar sync is not verified.</div>`;
+                showToast('GAS ping OK only. Calendar sync is not verified.', 'info', 5500);
             } else {
                 html += `<div class="diag-summary error">❌ 接続に失敗しました。GASのデプロイ設定（アクセス権: 全員）やクォータ制限を確認してください。</div>`;
                 showToast('接続失敗', 'error');
@@ -383,14 +383,14 @@ function initSync() {
                 const results = await Promise.all(syncResults);
                 let hasUnconfirmedResult = false;
                 let hasConfirmedResult = false;
-                let message = 'Google sync result';
+                let message = 'Google sync diagnostic result';
                 results.forEach(res => {
                     if (res.status === 'requested (fallback)' || res.status === 'cors_blocked') {
                         hasUnconfirmedResult = true;
                         message += `\n- ${res.type}: request sent, but GAS did not confirm completion`;
                     } else if (res.updated !== undefined) {
                         hasConfirmedResult = true;
-                        message += `\n- ${res.type}: GAS confirmed ${res.updated} item(s)`;
+                        message += `\n- ${res.type}: GAS returned ${res.status || 'ok'} for ${res.updated} item(s); Calendar visibility is not verified`;
                     }
                 });
                 if (calendarStats.eligible === 0 && localStorage.getItem('sync_calendar') === 'true') {

@@ -1260,6 +1260,7 @@ body {
     font-weight: 500;
 }
 
+.diag-summary.info { background: rgba(74, 144, 226, 0.1); color: var(--accent-color); }
 .diag-summary.success { background: rgba(80, 200, 120, 0.1); color: var(--success-color); }
 .diag-summary.error { background: rgba(255, 107, 107, 0.1); color: var(--danger-color); }
 
