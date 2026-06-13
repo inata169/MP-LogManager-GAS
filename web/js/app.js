@@ -2,6 +2,8 @@
  * メインアプリケーションロジック
  */
 
+let isManualSyncRunning = false;
+
 // アプリ初期化
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('MP-LogManager Web App v2.2.5 (Optimization & Fix) loading...');
@@ -346,7 +348,13 @@ function initSync() {
             showToast('GAS URLを設定してください', 'warning');
             return;
         }
+        if (isManualSyncRunning) {
+            showToast('Google sync is already running.', 'info', 2500);
+            return;
+        }
 
+        isManualSyncRunning = true;
+        syncBtn.disabled = true;
         const icon = syncBtn.querySelector('.icon');
         // 回転アニメーション開始
         const animation = icon.animate([
@@ -403,6 +411,8 @@ function initSync() {
             showToast(`同期失敗: ${error.message}\n(GASの承認が必要な場合があります)`, 'error', 6000);
         } finally {
             animation.cancel();
+            syncBtn.disabled = false;
+            isManualSyncRunning = false;
         }
     });
 }
