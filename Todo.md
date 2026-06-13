@@ -1,6 +1,13 @@
 # Todo List - Current Status (2026-06-13)
 
 ## Completed
+- [x] **v2.3.2-r5 Calendar diagnostic styling follow-up** (2026-06-13)
+  - [x] Changed readable-but-unverified Calendar sync diagnostics to informational feedback instead of success feedback.
+  - [x] Kept fallback/CORS/unreadable Calendar sync diagnostics as warnings.
+  - [x] Confirmed web assets and Service Worker cache are bumped to `v2.3.2-r5`.
+  - [x] Added `RELEASE_NOTES_v2.3.2-r5.md`.
+  - [x] Preserved v2.3.2 constraints: no data schema, GAS contract, or Calendar sync semantic changes.
+
 - [x] **v2.3.2 Release: Save/Load diagnostics, iPhone Tasks detail UX, and Calendar sync diagnostics** (released 2026-06-13)
   - [x] Adopted OpenSpec proposal: `improve-save-load-mobile-task-sync`.
   - [x] Cleaned OpenSpec files in readable English UTF-8.
@@ -34,6 +41,10 @@
   - [x] Moved persistence from GitHub data files to Google Drive through GAS.
 
 ## High Priority (Next)
+- [ ] **v2.3.2-r5 release finalization**
+  - [ ] Push `v2.3.2-r5` tag.
+  - [ ] Create or confirm GitHub Release `v2.3.2-r5`.
+
 - [ ] **Developer setup documentation**
   - [ ] Document recommended per-PC setup for Node.js LTS, npm, GitHub CLI, and OpenSpec CLI.
   - [ ] Decide whether to add `docs/DEV_SETUP.md` and/or `scripts/setup-dev.ps1`.

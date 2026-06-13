@@ -1,7 +1,15 @@
 # Handover Context - 2026-06-13
 
 ## Current Status
-v2.3.2 is complete and released. `main` and `origin/main` are synced at the v2.3.2 release state. The `v2.3.2` tag has been pushed, and the GitHub Release was created manually on GitHub.
+v2.3.2 is complete and released. `main` includes the v2.3.2-r5 follow-up patch for Calendar diagnostic toast styling. The `v2.3.2` tag has been pushed, and the GitHub Release was created manually on GitHub. The next release tag to create is `v2.3.2-r5`.
+
+## v2.3.2-r5 Follow-up
+- Calendar manual sync diagnostics now use informational styling when GAS returns a readable result but Calendar visibility is not verified.
+- Fallback, CORS-blocked, or unreadable Calendar sync responses remain warnings.
+- Web asset query strings are `v2.3.2-r5`.
+- Service Worker cache name is `mp-logmanager-gas-v2-3-2-r5`.
+- Added `RELEASE_NOTES_v2.3.2-r5.md`.
+- No app data format, GAS contract, or Calendar sync semantic changes were made.
 
 ## What Changed In v2.3.2
 - OpenSpec proposal adopted: `openspec/changes/improve-save-load-mobile-task-sync/`.
@@ -21,6 +29,7 @@ v2.3.2 is complete and released. `main` and `origin/main` are synced at the v2.3
 - `node --check web/js/app.js`
 - `node --check web/js/tasks.js`
 - `node --check web/js/journal.js`
+- v2.3.2-r5: `node --check web/js/app.js`
 - `openspec validate improve-save-load-mobile-task-sync --strict --no-interactive`
 - Manual browser verification:
   - Tasks save OK.
@@ -44,6 +53,7 @@ v2.3.2 is complete and released. `main` and `origin/main` are synced at the v2.3
 
 ## Suggested Next Work
 - Add developer setup documentation for Node/npm, GitHub CLI, and OpenSpec CLI.
+- Create or confirm the GitHub Release for `v2.3.2-r5` after the tag is pushed.
 - Decide whether to archive `openspec/changes/improve-save-load-mobile-task-sync/`.
 - Plan larger v2.3.3+ work separately:
   - stable Calendar matching
