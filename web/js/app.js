@@ -390,21 +390,21 @@ function initSync() {
             } else {
                 const results = await Promise.all(syncResults);
                 let hasUnconfirmedResult = false;
-                let hasConfirmedResult = false;
+                let hasReadableDiagnostic = false;
                 let message = 'Google sync diagnostic result';
                 results.forEach(res => {
                     if (res.status === 'requested (fallback)' || res.status === 'cors_blocked') {
                         hasUnconfirmedResult = true;
                         message += `\n- ${res.type}: request sent, but GAS did not confirm completion`;
                     } else if (res.updated !== undefined) {
-                        hasConfirmedResult = true;
+                        hasReadableDiagnostic = true;
                         message += `\n- ${res.type}: GAS returned ${res.status || 'ok'} for ${res.updated} item(s); Calendar visibility is not verified`;
                     }
                 });
                 if (calendarStats.eligible === 0 && localStorage.getItem('sync_calendar') === 'true') {
                     message += '\n- Calendar: no eligible tasks with due dates';
                 }
-                showToast(message, hasUnconfirmedResult || !hasConfirmedResult ? 'warning' : 'success', 6500);
+                showToast(message, hasUnconfirmedResult || !hasReadableDiagnostic ? 'warning' : 'info', 6500);
             }
         } catch (error) {
             console.error('Manual sync failed:', error);
