@@ -1,5 +1,21 @@
 # Daily Summary - 2026-06-13
 
+## v2.3.2-r5 Release Prepared
+v2.3.2-r5 was prepared as a small follow-up release for Calendar sync diagnostic feedback. The app behavior remains unchanged: readable GAS sync results that do not verify Calendar visibility are informational diagnostics, while fallback/CORS/unreadable responses remain warnings.
+
+### r5 Completed Work
+- Confirmed `main` includes PR #12: Calendar diagnostics use info styling instead of success styling for unverified visibility.
+- Confirmed web asset query strings are `v2.3.2-r5`.
+- Confirmed Service Worker cache name is `mp-logmanager-gas-v2-3-2-r5`.
+- Added `RELEASE_NOTES_v2.3.2-r5.md`.
+
+### r5 Constraints
+- No JSON schema or top-level data structure changes.
+- No GAS API contract changes.
+- No Calendar sync semantic changes.
+- No stable Calendar event matching, event ID persistence, upsert behavior, deduplication, JSON splitting, differential save, or archive migration.
+- Save still does not automatically sync Calendar events.
+
 ## v2.3.2 Release Completed
 v2.3.2 was completed, validated, tagged, and released. This release stayed intentionally low risk: diagnostics and UX only, with no JSON schema changes, no top-level data structure changes, no GAS API contract changes, and no Calendar sync semantic changes.
 
