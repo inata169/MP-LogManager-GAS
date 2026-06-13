@@ -17,7 +17,7 @@ v2.3.2 is complete and released. `main` includes the v2.3.2-r5 follow-up patch f
   - `add-task-templates`
   - `add-compact-responsive-layout`
 - Created live OpenSpec specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, `mobile-task-ux`, and `task-management`.
-- `add-google-sync` remains active because it still has incomplete tasks.
+- `add-google-sync` remains active because OpenSpec reports it as `11/15 tasks`; it should not be archived until the remaining 4 tasks are resolved, marked obsolete, or explicitly completed.
 - No app data format, GAS contract, or Calendar sync semantic changes were made.
 
 ## What Changed In v2.3.2
@@ -63,6 +63,7 @@ v2.3.2 is complete and released. `main` includes the v2.3.2-r5 follow-up patch f
 - For multi-PC development, prefer installing Node.js LTS, GitHub CLI, and OpenSpec CLI on each PC, or add a future `docs/DEV_SETUP.md` / setup script.
 
 ## Suggested Next Work
+- Review `openspec/changes/add-google-sync/tasks.md`; resolve the remaining 4 unchecked tasks before archiving `add-google-sync`.
 - Add developer setup documentation for Node/npm, GitHub CLI, and OpenSpec CLI.
 - Plan larger v2.3.3+ work separately:
   - stable Calendar matching
