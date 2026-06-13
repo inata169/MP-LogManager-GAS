@@ -28,6 +28,7 @@ The following OpenSpec archive work happened after the `v2.3.2-r5` tag and GitHu
 - Added the deployed multi-entry Journal behavior to the live Journal spec.
 - Reconciled `add-google-sync` with the deployed manual-sync behavior and archived it.
 - The live Google sync spec now covers settings, manual Calendar/Google Tasks sync requests, GAS setup/template endpoints, and that task save does not auto-sync.
+- Follow-up: the live Google sync spec also preserves the deployed per-task Calendar opt-out behavior (`sync_calendar === false` excludes that task from manual Calendar sync).
 
 ## What Changed In v2.3.2
 - OpenSpec proposal adopted: `openspec/changes/improve-save-load-mobile-task-sync/`.
@@ -52,6 +53,7 @@ The following OpenSpec archive work happened after the `v2.3.2-r5` tag and GitHu
 - `openspec validate add-google-sync --strict --no-interactive`
 - `openspec validate --specs --strict --no-interactive`
 - `openspec list`
+- Google sync spec follow-up: `openspec validate --specs --strict --no-interactive`
 - Manual browser verification:
   - Tasks save OK.
   - Journal save OK.
