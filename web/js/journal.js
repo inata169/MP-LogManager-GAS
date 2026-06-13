@@ -201,7 +201,11 @@ async function saveJournals() {
         if (result.content && result.content.sha) {
             journalsSha = result.content.sha;
         }
-        showToast('Journal saved.', 'success', 1800);
+        if (DataAPI.isUnconfirmedSaveResult(result)) {
+            showToast('Journal save request sent, but GAS did not confirm persistence. Reload to verify.', 'warning', 6500);
+        } else {
+            showToast('Journal saved.', 'success', 1800);
+        }
 
         const sizeWarning = DataAPI.getLargeDataWarning('journals');
         if (sizeWarning) {

@@ -411,6 +411,10 @@ DataAPI.getLargeDataWarning = function(type) {
     return null;
 };
 
+DataAPI.isUnconfirmedSaveResult = function(result) {
+    return result?.status === 'cors_blocked' || result?.status === 'requested (fallback)';
+};
+
 const originalGasFetchData = gasAPI.fetchData.bind(gasAPI);
 gasAPI.fetchData = async function(type) {
     const started = performance.now();
