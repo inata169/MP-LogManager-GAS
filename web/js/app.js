@@ -194,8 +194,6 @@ function initModals() {
             if (result.ok) {
                 html += `<div class="diag-summary success">GAS ping OK. This confirms basic GAS connectivity only; Calendar sync still requires a manual sync check.</div>`;
                 showToast('GAS ping OK. Calendar sync is not verified yet.', 'success', 5000);
-                html += `<div class="diag-summary success">✅ 接続に成功しました。設定を保存してリロードしてください。</div>`;
-                showToast('接続成功！', 'success');
             } else {
                 html += `<div class="diag-summary error">❌ 接続に失敗しました。GASのデプロイ設定（アクセス権: 全員）やクォータ制限を確認してください。</div>`;
                 showToast('接続失敗', 'error');
@@ -383,15 +381,22 @@ function initSync() {
                 showToast('同期設定がオフになっています', 'warning');
             } else {
                 const results = await Promise.all(syncResults);
-                let message = 'Google 同期が完了しました';
+                let hasUnconfirmedResult = false;
+                let hasConfirmedResult = false;
+                let message = 'Google sync result';
                 results.forEach(res => {
-                    if (res.updated !== undefined) {
-                        message += `\n- ${res.type}: ${res.updated}件`;
-                    } else if (res.status === 'requested (fallback)' || res.status === 'cors_blocked') {
-                        message += `\n- ${res.type}: 通信不安定（要カレンダー確認）`;
+                    if (res.status === 'requested (fallback)' || res.status === 'cors_blocked') {
+                        hasUnconfirmedResult = true;
+                        message += `\n- ${res.type}: request sent, but GAS did not confirm completion`;
+                    } else if (res.updated !== undefined) {
+                        hasConfirmedResult = true;
+                        message += `\n- ${res.type}: GAS confirmed ${res.updated} item(s)`;
                     }
                 });
-                showToast(message, 'success', 5000);
+                if (calendarStats.eligible === 0 && localStorage.getItem('sync_calendar') === 'true') {
+                    message += '\n- Calendar: no eligible tasks with due dates';
+                }
+                showToast(message, hasUnconfirmedResult || !hasConfirmedResult ? 'warning' : 'success', 6500);
             }
         } catch (error) {
             console.error('Manual sync failed:', error);

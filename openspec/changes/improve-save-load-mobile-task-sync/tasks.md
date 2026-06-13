@@ -19,6 +19,6 @@
 - [x] 3.1 Run `node --check web/js/api.js web/js/app.js web/js/tasks.js web/js/journal.js`.
 - [ ] 3.2 Run `openspec validate improve-save-load-mobile-task-sync --strict --no-interactive` if the OpenSpec CLI is available.
 - [x] 3.3 Manually verify save/load return values and persisted JSON format remain unchanged.
-- [ ] 3.4 Manually verify iPhone-width task detail editing is more usable after deployment.
+- [x] 3.4 Manually verify iPhone-width task detail editing is more usable after deployment.
 - [ ] 3.5 Manually verify GAS ping messaging and Calendar sync diagnostics are distinct after deployment.
 - [x] 3.6 Verify the Service Worker cache version bump keeps old-cache cleanup behavior unchanged.
