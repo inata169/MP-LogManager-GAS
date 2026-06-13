@@ -34,7 +34,7 @@
 - **Flexible Management**: カテゴリ、優先度、期限によるタスク管理。
 - **Real-time Search**: 全タスクを複数キーワードで検索。
 - **Dense Task List**: PC では複数カラム、iPhone では省スペース表示で一覧性を向上。
-- **Google Sync (v2.2.5 Optimized)**: Google カレンダーおよび Google Tasks (Todo) との同期機能。**※重要: 初回利用時に GAS 側での「承認（手動実行）」が必要です。**
+- **Google Sync (v2.2.5 Optimized)**: Google カレンダーおよび Google Tasks (Todo) との同期機能。**タスク保存時には自動同期されません。設定を ON にしたうえで、ヘッダーの同期ボタンから手動実行してください。** 初回利用時は GAS 側での「承認（手動実行）」が必要です。
 
 ---
 
@@ -49,6 +49,7 @@
 2. **Web App への設定**
    - 発行された **GitHub Pages URL** にアクセス。
    - 右上の設定(⚙️)ボタンから、自分専用の **GAS Web App URL** を入力して保存。
+   - Google 同期を使う場合は、設定で Calendar / Tasks 同期を ON にしたあと、ヘッダーの同期ボタンで手動同期します。タスク保存だけでは Google 側へ反映されません。
 
 3. **データの復旧・移行**
    - Google Drive 上の JSON ファイルを直接編集することでバックアップや移行が可能です。
