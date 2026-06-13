@@ -7,6 +7,12 @@
   - [x] Confirmed web assets and Service Worker cache are bumped to `v2.3.2-r5`.
   - [x] Added `RELEASE_NOTES_v2.3.2-r5.md`.
   - [x] Preserved v2.3.2 constraints: no data schema, GAS contract, or Calendar sync semantic changes.
+  - [x] Confirmed GitHub Release `v2.3.2-r5` was created manually.
+
+- [x] **OpenSpec archive: improve-save-load-mobile-task-sync** (2026-06-13)
+  - [x] Archived the completed change under `openspec/changes/archive/2026-06-13-improve-save-load-mobile-task-sync/`.
+  - [x] Created live specs for `data-performance`, `google-sync`, and `mobile-task-ux`.
+  - [x] Verified `openspec validate --specs --strict --no-interactive`.
 
 - [x] **v2.3.2 Release: Save/Load diagnostics, iPhone Tasks detail UX, and Calendar sync diagnostics** (released 2026-06-13)
   - [x] Adopted OpenSpec proposal: `improve-save-load-mobile-task-sync`.
@@ -41,19 +47,10 @@
   - [x] Moved persistence from GitHub data files to Google Drive through GAS.
 
 ## High Priority (Next)
-- [ ] **v2.3.2-r5 release finalization**
-  - [x] Push `v2.3.2-r5` tag.
-  - [ ] Create or confirm GitHub Release `v2.3.2-r5`.
-
 - [ ] **Developer setup documentation**
   - [ ] Document recommended per-PC setup for Node.js LTS, npm, GitHub CLI, and OpenSpec CLI.
   - [ ] Decide whether to add `docs/DEV_SETUP.md` and/or `scripts/setup-dev.ps1`.
   - [ ] Keep `.codex-tools/` local-only; do not commit portable binaries.
-
-- [ ] **OpenSpec archive decision**
-  - [ ] Decide whether to archive `openspec/changes/improve-save-load-mobile-task-sync/`.
-  - [ ] If archiving, update live specs or use the appropriate `openspec archive` mode.
-  - [ ] Run validation after archive.
 
 - [ ] **v2.3.3+ planning**
   - [ ] Stable Calendar event matching.
