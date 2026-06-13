@@ -1,129 +1,44 @@
-# 日次サマリー - 2026-06-03
-## Tasks 高密度レスポンシブレイアウト v2.3.1 / README 更新
-Journal 高密度化に続き、Tasks 画面も PC/iPhone の両方で一覧性を高める方向に調整しました。あわせて、PC 幅で Journal が広がらない原因だった共通 `max-width: 800px` 制限を修正し、公開反映と README スクリーンショット更新まで完了しました。
+# Daily Summary - 2026-06-13
 
-### 実装・対応内容
-- **Tasks 画面の高密度化**:
-  - PC では検索/フィルタ領域を横並びにし、タスクカードを2〜3カラム表示に変更しました。
-  - iPhone では検索欄、フィルタ、カード余白、バッジ、詳細プレビューを圧縮しました。
-- **Journal/Tasks 共通の横幅制限修正**:
-  - `@media (min-width: 768px)` の `#app-main { max-width: 800px; }` が 1024px 以上でも残っていたため、1024px 以上では `max-width: 1480px` を明示して上書きしました。
-- **PWA キャッシュ更新**:
-  - `index.html` の CSS/JS クエリを `v=2.3.1` に更新し、`sw.js` の `CACHE_NAME` を `mp-logmanager-gas-v2-3-1` に更新しました。
-- **README 更新**:
-  - version badge を `2.3.1` に更新しました。
-  - iPhone 版 Journal / Tasks の最新スクリーンショットを `docs/pics/mobile-*.png` として追加し、README では横並び表示にしました。
+## v2.3.2 Release Completed
+v2.3.2 was completed, validated, tagged, and released. This release stayed intentionally low risk: diagnostics and UX only, with no JSON schema changes, no top-level data structure changes, no GAS API contract changes, and no Calendar sync semantic changes.
 
-### 検証
-- `node --check web/js/journal.js`: 成功。
-- `node --check web/js/tasks.js`: 成功。
-- ユーザー確認により、GitHub Pages / ローカルで `style.css?v=2.3.1` 読み込み、PC 最大幅の Journal 拡張、Tasks 2〜3カラム、iPhone 幅の Tasks/Journal 表示を確認済み。
-- 公開 URL から README、GitHub Pages HTML、CSS を直接取得し、`v=2.3.1`、`max-width: 1480px`、Tasks グリッド指定の反映を確認済み。
+### Completed Work
+- Adopted `openspec/changes/improve-save-load-mobile-task-sync/` as the official v2.3.2 OpenSpec proposal.
+- Rewrote the OpenSpec proposal, design, tasks, and spec deltas in readable English UTF-8.
+- Added diagnostic-only `DataAPI.lastMetrics` for save/load type, item count, approximate JSON size, timing, status, and timestamp.
+- Added Tasks/Journal save start, confirmed success, failure, and large JSON warning feedback.
+- Changed unconfirmed GAS save responses (`cors_blocked`, `requested (fallback)`) to warning feedback instead of confirmed success.
+- Enlarged the iPhone Tasks details textarea and verified it is usable.
+- Clarified that GAS connection test only verifies GAS ping, not Calendar sync.
+- Added manual Calendar sync diagnostics for sent/skipped/completed task counts.
+- Prevented duplicate manual sync requests while a sync is already running.
+- Updated web asset query strings and Service Worker cache name through `v2.3.2-r4`.
+- Added `RELEASE_NOTES_v2.3.2.md`.
+- Created and pushed the `v2.3.2` tag.
+- GitHub Release `v2.3.2` was created manually on GitHub.
 
-### Git
-- `6981595 Improve compact responsive Tasks layout`
-- `8539fa0 Update README screenshots for v2.3.1`
-- `9327c5a Display README screenshots side by side`
-- 上記はいずれも `origin/main` へ push 済み。
+### Verification
+- `node --check web/js/api.js`
+- `node --check web/js/app.js`
+- `node --check web/js/tasks.js`
+- `node --check web/js/journal.js`
+- `openspec validate improve-save-load-mobile-task-sync --strict --no-interactive`
+- Manual browser checks:
+  - Tasks save OK.
+  - Journal save OK.
+  - iPhone Tasks detail field OK.
+  - GAS ping and Calendar sync messaging are distinct.
+  - Manual Calendar sync OK.
+  - Repeated sync-button taps produce only one Calendar event.
 
-### 次の候補
-- モバイル Journal の Markdown 表示で、太字や装飾が大きく見える箇所のフォントサイズ・行間調整。
-- PWA のオフライン通知やアイコンのブラッシュアップ。
+### Notes
+- Save still does not automatically sync Calendar events. Manual sync remains required by design in v2.3.2.
+- Stable Calendar event matching, event ID persistence, upsert behavior, deduplication, JSON splitting, differential save, and archive migration remain future work.
+- `.codex-tools/` was created locally for portable `node`, `npm`, `gh`, and OpenSpec CLI usage, but is not committed.
 
-# 日次サマリー - 2026-06-02
-## Journal 高密度レスポンシブレイアウト v2.3.0
-2か月の実利用で判明した「PCブラウザ版・iPhoneブラウザ版ともに画面内の情報量が少ない」という課題に対応しました。今回は特に Journal 画面を優先し、本文を読む・書く領域を広げる方向で UI を圧縮しました。
-
-### 実装・対応内容
-- **OpenSpec 提案の作成**:
-  - `openspec/changes/add-compact-responsive-layout/` を作成し、PC/iPhone 両方で Journal の作業領域を増やす要件を定義しました。
-- **PC 版の横幅活用**:
-  - `#app-main` を最大 1480px まで広げ、Journal の一覧とエディタが横方向の余白を活用できるようにしました。
-- **iPhone 版の縦方向圧縮**:
-  - ヘッダー、下部ナビ、日付操作、検索欄、Journal カード、エディタ外枠、EasyMDE ツールバーの余白を削減しました。
-  - EasyMDE ツールバーは横スクロール1段を基本とし、本文領域を圧迫しにくくしました。
-- **Journal 一覧トグル**:
-  - モバイル編集中は検索欄とエントリ一覧を畳み、`List` / `Edit` ボタンで切り替えられるようにしました。
-- **PWA キャッシュ更新**:
-  - `index.html` の CSS/JS クエリを `v=2.3.0` に更新し、`sw.js` の `CACHE_NAME` を `mp-logmanager-gas-v2-3-0` に更新しました。
-
-### 検証
-- `openspec.cmd validate add-compact-responsive-layout --strict --no-interactive`: 成功。
-- `node --check web/js/journal.js`: 成功。
-- ローカルサーバー `http://localhost:8787/` で表示確認。
-- ユーザーによる in-app browser 確認で「いい感じ」と評価、OpenSpec タスク完了済み。
-
-### 次の候補
-- Tasks 画面も同じ思想で高密度化し、PC/iPhone の一覧表示件数を増やす。
-- Journal のヘッダー周辺をさらに整理し、日付・List/Edit・保存操作をより少ない面積にまとめる。
-
-# 日次サマリー - 2026-03-30
-## 🚀 Google Drive + GAS 連携への移行と履歴のクリーンアップ
-個人データの流出リスクを完全に排除するため、GitHub API に依存しない Google Drive + Google Apps Script (GAS) 連携構成への抜本的な移行を実施しました。
-### 実装・対応内容
-- **独立したクリーンリポジトリの作成**:
-  - MP-LogManager-GAS を新規作成。Git履歴を完全にリセットし、過去の機密データを完全に抹消。
-- **Google Apps Script (GAS) API の構築**:
-  - Google Drive 上の JSON ファイルを操作する doGet / doPost エンドポイントを実装。
-- **Web App フロントエンドの改修**:
-  - データの取得・保存先を GAS API へ切り替え。設定画面に「GAS Web App URL」入力を追加。
-  - **[最終修正]** ブラウザの強力なキャッシュを回避するため、fetch URLにタイムスタンプ (\	=\\) を付与。
-  - **[最終修正]** sw.js の CACHE_NAME を更新し、古い PWA キャッシュを強制破棄。
-- **公開と整備**:
-  - GitHub Pages でデプロイし、README を GAS 連携仕様に刷新。
----
-# 日次サマリー - 2026-03-31
-## 🚀 Web App (GAS Edition) 安定性向上とUI/UXの最終調整
-実運用に向け、モバイル環境での堅牢性と操作性を高めるためのブラッシュアップを実施しました。
-
-### 実装・対応内容
-- **通信プラットフォームの強化 (api.js)**:
-  - **指数バックオフリトライ**: 一時的な通信エラー時に最大3回まで自動リトライ。
-  - **タイムアウト処理**: 10秒（更新は15秒）で制御を戻し、フリーズを防止。
-  - **疎通確認 (ping)**: 設定画面で GAS URL の接続テストが可能に。
-- **UI/UX の刷新**:
-  - **トースト通知**: `alert()` を廃止し、モダンなスナックバー通知を導入。
-  - **SafeArea 対応**: iPhone のノッチやホームバーに重ならないレイアウト調整。
-  - **iOS ズーム防止**: フォームのフォントサイズを 16px に固定し、入力時のズーム動作を抑制。
-  - **タップ領域拡大**: アイコンボタンの最小サイズを 44px に確保。
-- **一括置換とクリーンアップ**:
-  - 全 JS ファイル (`app.js`, `tasks.js`, `journal.js`) から `alert()` を除去し `showToast()` に統合。
-  - `Todo.md` / `99-handover_context.md` の更新。
-- **ドキュメントの親切化とビジュアル化**:
-  - **初心者向けセットアップガイド (`docs/SETUP_GUIDE.md`)**: Google Drive/GAS の構築手順を詳述し、READMEからリンク。
-  - **スクリーンショットの追加**: README に実際の Tasks/Journal の操作画面を掲載。
----
----
-# 日次サマリー - 2026-04-02
-## 🚀 Google Sync 最適化と、診断機能による信頼性向上
-GAS 連携における「接続失敗」や「クォータ制限」の問題を根本的に解決するため、通信ロジックの効率化と詳細なデバッグ機能を導入しました。
-
-### 実装・対応内容
-- **接続診断ツール (Diagnostics)**:
-  - CORS 制約の有無や、直近の同期エラーログを詳細に表示する機能を設定画面に追加。ブラウザ側のブロックか Google 側のエラーかを即座に判別可能に。
-- **同期ロジックの抜本的最適化 (v2.2.1)**:
-  - **手動同期への移行**: チェックボックス操作ごとの自動同期を廃止し、ヘッダーのクラウドボタン（☁️）による一括同期を導入。API 呼び出し頻度を劇的に削減。
-  - **ペイロードの削減**: 同期対象を「未完了タスク」のみに限定。通信量の削減と GAS 側の負荷を大幅に軽減。
-  - **GAS 側での差分更新**: Google API 呼び出し前にデータの差異をチェックし、変更がない場合は更新をスキップするロジックを GAS スクリプトに実装。
-- **UI/UX のブラッシュアップ**:
-  - 同期実行中のアニメーションとトースト通知の実装。
-  - 同期設定がオフの場合のボタン状態の改善。
-- **デプロイとドキュメント**:
-  - `docs/GOOGLE_SYNC_SETUP.md` を最新の最適化版 GAS コードと初心者向け手順で刷新。
-  - GitHub リリース v2.2.1 を作成。
----
-# 日報サマリー - 2026-04-02 (Final)
-## 🚀 Google Sync 接続不具合の解消と v2.2.5 リリース
-「同期完了と出るのにカレンダーに反映されない」というサイレントな失敗を解消し、誰でも確実にセットアップできる体制を整えました。
-
-### 実装・対応内容 (v2.2.5)
-- **「GAS 手動実行・承認」の徹底**:
-  - Google のセキュリティ仕様により、Web App デプロイ後に初回のみ GAS エディタで手動実行を行う必要があることを明文化。`README.md` および各ガイドを更新しました。
-- **通信モードの改善 (CORS 対応)**:
-  - `api.js` で `mode: 'cors'` を有効化。これにより、GAS 側でエラーが発生した際にブラウザ上でその内容（「認可が必要です」等）を具体的に読めるようになりました。
-- **同期フィードバックの強化**:
-  - 同期ボタンをクリックした際、完了後に「Calendar: 〇件」などの処理数を表示するように UI を改善。
-- **認可テスト関数の提供**:
-  - GAS スクリプトに `testAuth()` 関数を追加。これを一回実行するだけで、すべての権限承認をスマートに完了できるようになりました。
-- **バージョン管理**:
-  - `v=2.2.5` への全面更新とキャッシュ破棄（`sw.js` CACHE_NAME を更新）により、最新版の反映を確実化。
+## Recent History
+- 2026-06-03: v2.3.1 improved Tasks density, desktop width usage, README screenshots, and PWA cache versioning.
+- 2026-06-02: v2.3.0 improved Journal density and responsive layout.
+- 2026-04-02: v2.2.5 completed Google sync setup reliability and GAS authorization guidance.
+- 2026-03-30: v2.0.0 moved persistence to Google Drive + GAS.

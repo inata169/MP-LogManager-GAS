@@ -1,56 +1,63 @@
-# Handover Context (2026-06-03 更新)
-## 2026-06-02 追記: v2.3.0 Journal 高密度レスポンシブレイアウト
-### 現在のステータス
-Journal 画面の情報密度改善を実装済み。PCブラウザ版では横幅を広く使い、iPhoneブラウザ/PWA版ではヘッダー・ナビ・検索・一覧・EasyMDE 周辺の余白を圧縮しました。モバイルでは編集中に Journal 一覧と検索を畳み、`List` / `Edit` ボタンで切り替えられます。
+# Handover Context - 2026-06-13
 
-### 変更ファイル
-- `web/css/style.css`: PC/iPhone 向けの compact responsive CSS を追加。
-- `web/index.html`: Journal 用 `List` トグル追加、CSS/JS クエリを `v=2.3.0` に更新。
-- `web/js/journal.js`: `entry-active` / `list-open` 状態制御と `List` / `Edit` 切り替えを追加。
-- `web/sw.js`: Service Worker キャッシュ名を `mp-logmanager-gas-v2-3-0` に更新。
-- `openspec/changes/add-compact-responsive-layout/`: 提案、タスク、spec delta を追加。
+## Current Status
+v2.3.2 is complete and released. `main` and `origin/main` are synced at the v2.3.2 release state. The `v2.3.2` tag has been pushed, and the GitHub Release was created manually on GitHub.
 
-### 検証済み
-- `openspec.cmd validate add-compact-responsive-layout --strict --no-interactive`
-- `node --check web/js/journal.js`
-- `http://localhost:8787/` でローカル表示確認、ユーザー確認済み。
+## What Changed In v2.3.2
+- OpenSpec proposal adopted: `openspec/changes/improve-save-load-mobile-task-sync/`.
+- OpenSpec documents were cleaned up in readable English UTF-8.
+- Added diagnostic-only save/load metrics via `DataAPI.lastMetrics`.
+- Added non-blocking JSON size warnings and clearer Tasks/Journal save feedback.
+- Changed unconfirmed GAS save responses (`cors_blocked`, `requested (fallback)`) to warning feedback instead of confirmed success.
+- Enlarged the iPhone Tasks detail textarea.
+- Clarified that GAS connection test only verifies GAS ping, not Calendar sync.
+- Added manual Calendar sync diagnostics for sent/skipped/completed task counts.
+- Prevented duplicate manual sync requests while a sync is already running.
+- Bumped web asset query strings and Service Worker cache name to `v2.3.2-r4`.
+- Added `RELEASE_NOTES_v2.3.2.md`.
 
-## 2026-06-03 追記: v2.3.1 Tasks 高密度レスポンシブレイアウト
-### 現在のステータス
-Tasks 画面の情報密度改善を実装済み。PCブラウザ版ではフィルタ領域を横並びにし、タスクカードを2〜3カラムで表示します。iPhoneブラウザ/PWA版では検索/フィルタ、カード余白、バッジ、詳細プレビューの高さを圧縮しました。
-
-### 変更ファイル
-- `web/css/style.css`: Tasks 用 compact responsive CSS を追加。
-- `web/index.html`: CSS/JS クエリを `v=2.3.1` に更新。
-- `web/sw.js`: Service Worker キャッシュ名を `mp-logmanager-gas-v2-3-1` に更新。
-- `README.md`: v2.3.1 表記、Journal/Tasks 最新スクリーンショットの横並び表示を追加。
-- `docs/pics/mobile-journal-v2.3.1.png`, `docs/pics/mobile-tasks-v2.3.1.png`: iPhone 版スクリーンショットを追加。
-
-### 検証済み
-- `node --check web/js/journal.js`
+## Verification Completed
+- `node --check web/js/api.js`
+- `node --check web/js/app.js`
 - `node --check web/js/tasks.js`
-- GitHub Pages / ローカルで `style.css?v=2.3.1` 読み込みをユーザー確認済み。
-- PC 最大幅で Journal が広がること、Tasks が2〜3カラム表示になること、iPhone 幅で Tasks/Journal が操作可能なことをユーザー確認済み。
-- 公開 URL から README / HTML / CSS を直接取得し、README 横並び画像、`v=2.3.1`、`max-width: 1480px`、Tasks グリッド指定の反映を確認済み。
+- `node --check web/js/journal.js`
+- `openspec validate improve-save-load-mobile-task-sync --strict --no-interactive`
+- Manual browser verification:
+  - Tasks save OK.
+  - Journal save OK.
+  - iPhone Tasks detail field expanded and usable.
+  - GAS ping messaging is distinct from Calendar sync diagnostics.
+  - Manual Calendar sync creates events.
+  - Sync-button repeated taps do not create duplicate events.
 
-### Git
-- `6981595 Improve compact responsive Tasks layout` push 済み。
-- `8539fa0 Update README screenshots for v2.3.1` push 済み。
-- `9327c5a Display README screenshots side by side` push 済み。
+## Important Constraints Preserved
+- No JSON schema or top-level data structure changes.
+- No GAS API contract changes.
+- No Calendar sync semantic changes.
+- No stable Calendar event matching, event ID persistence, upsert behavior, deduplication, JSON splitting, differential save, or archive migration.
+- Save does not automatically sync Calendar events; manual sync is still required.
 
-## 📌 現在のステータス
-v2.2.5 (GAS Edition) 安定版 [完了]。Google 同期における「認可・認証」の課題を完全に解決し、エラー情報の可視化とセットアップ手順の明文化を完了しました。
+## Local Workspace Notes
+- `.codex-tools/` exists locally and contains portable `node`, `npm`, `gh`, and OpenSpec CLI tooling.
+- `.codex-tools/` is intentionally not committed because it is PC-specific and large.
+- For multi-PC development, prefer installing Node.js LTS, GitHub CLI, and OpenSpec CLI on each PC, or add a future `docs/DEV_SETUP.md` / setup script.
 
-### ✅ 実装/完了済み
-- **v2.2.5 Release**: Google 同期の接続・認可エラーの徹底修正、同期件数表示、認可ガイドの追記。
-- **v2.2.4 Release**: 個別同期設定（チェックボックス）の追加と、診断表示バグの修正。
-- **v2.2.1 Release**: GAS クォータ制限対策（手動同期移行、データ削減）および接続診断ツールの実装。
-- **v2.2.0 Release**: Google Calendar と Google Tasks (Todo) との同期機能（一方向）の実搬。
-- **v2.1.0 Release**: 安定性向上（リトライ、タイムアウト）とモバイルUX（トースト、iOSズーム防止）の向上。
-- **Connection Diagnostics**: 設定画面に詳細な接続テストとエラーログ表示機能を追加。
-- **Sync Optimization**: 送信データのフィルタリングと GAS 側での差分更新ロジックによりクォータ消費を約 90% 削減。
-- **v2.0.0 Release**: GAS 連携を標準としたメジャーアップデートの完了。
+## Suggested Next Work
+- Add developer setup documentation for Node/npm, GitHub CLI, and OpenSpec CLI.
+- Decide whether to archive `openspec/changes/improve-save-load-mobile-task-sync/`.
+- Plan larger v2.3.3+ work separately:
+  - stable Calendar matching
+  - event ID persistence
+  - dedup/upsert improvements
+  - JSON splitting
+  - differential save
+  - archive migration
+- Continue UI/PWA polish:
+  - mobile Journal Markdown display tuning
+  - offline notification/icon polish
 
-## 🎯 次のステップ
-- **UI 強化**: モバイル Journal の Markdown 表示サイズ調整、検索キーワードの強調表示（ハイライト）など、さらなる使い勝手の向上。
-- **PWA 強化**: アイコンのブラッシュアップおよびオフライン時のインジケータ改善。
+## Recent History
+- 2026-06-03: v2.3.1 Tasks density and README screenshot update completed.
+- 2026-06-02: v2.3.0 Journal dense responsive layout completed.
+- 2026-04-02: v2.2.5 Google sync setup reliability completed.
+- 2026-03-30: v2.0.0 Google Drive + GAS migration completed.
