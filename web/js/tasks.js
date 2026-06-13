@@ -219,7 +219,11 @@ async function saveTasks() {
         if (result.content && result.content.sha) {
             tasksSha = result.content.sha;
         }
-        showToast('Tasks saved.', 'success', 1800);
+        if (DataAPI.isUnconfirmedSaveResult(result)) {
+            showToast('Tasks save request sent, but GAS did not confirm persistence. Reload to verify.', 'warning', 6500);
+        } else {
+            showToast('Tasks saved.', 'success', 1800);
+        }
 
         const sizeWarning = DataAPI.getLargeDataWarning('tasks');
         if (sizeWarning) {
