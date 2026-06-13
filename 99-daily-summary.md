@@ -24,12 +24,16 @@ v2.3.2-r5 was prepared as a small follow-up release for Calendar sync diagnostic
 After the `v2.3.2-r5` tag and GitHub Release, completed OpenSpec changes were archived as repository maintenance. This happened after the release tag, so these archive commits are not part of the `v2.3.2-r5` tagged release contents.
 
 ### OpenSpec Maintenance Completed
-- Archived completed OpenSpec changes and created live specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, `mobile-task-ux`, and `task-management`.
+- Archived completed OpenSpec changes and created live specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, and `mobile-task-ux`.
+- Removed undeployed task-template behavior from current specs; `add-task-templates` remains archived documentation only until the Web App implements templates.
+- Aligned the large-data warning spec with implemented save-time byte-threshold warnings.
+- Added deployed multi-entry Journal behavior to the current Journal spec.
 - Left `add-google-sync` active because it is still `11/15 tasks`; the remaining 4 tasks must be reviewed before archive.
 
 ### OpenSpec Maintenance Verification
 - `openspec validate --specs --strict --no-interactive`
-- `openspec list` now leaves only `add-google-sync` active because it is still `11/15 tasks`; the remaining 4 tasks must be reviewed before archive.
+- Current spec validation passes with 5 live specs.
+- `openspec list` leaves only `add-google-sync` active because it is still `11/15 tasks`; the remaining 4 tasks must be reviewed before archive.
 
 ## v2.3.2 Release Completed
 v2.3.2 was completed, validated, tagged, and released. This release stayed intentionally low risk: diagnostics and UX only, with no JSON schema changes, no top-level data structure changes, no GAS API contract changes, and no Calendar sync semantic changes.

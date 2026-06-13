@@ -21,7 +21,10 @@ The following OpenSpec archive work happened after the `v2.3.2-r5` tag and GitHu
   - `add-journal-rich-editor`
   - `add-task-templates`
   - `add-compact-responsive-layout`
-- Created live OpenSpec specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, `mobile-task-ux`, and `task-management`.
+- Created live OpenSpec specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, and `mobile-task-ux`.
+- Removed the archived-but-undeployed task-template requirement from current specs; `add-task-templates` remains archived documentation only until the Web App implements templates.
+- Tightened `data-performance` large-data warnings to the implemented save-time byte-threshold behavior.
+- Added the deployed multi-entry Journal behavior to the live Journal spec.
 - `add-google-sync` remains active because OpenSpec reports it as `11/15 tasks`; it should not be archived until the remaining 4 tasks are resolved, marked obsolete, or explicitly completed.
 
 ## What Changed In v2.3.2
