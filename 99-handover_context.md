@@ -29,6 +29,7 @@ The following OpenSpec archive work happened after the `v2.3.2-r5` tag and GitHu
 - Reconciled `add-google-sync` with the deployed manual-sync behavior and archived it.
 - The live Google sync spec now covers settings, manual Calendar/Google Tasks sync requests, GAS setup/template endpoints, and that task save does not auto-sync.
 - Follow-up: the live Google sync spec also preserves the deployed per-task Calendar opt-out behavior (`sync_calendar === false` excludes that task from manual Calendar sync).
+- Documentation follow-up: `README.md`, `docs/GOOGLE_SYNC_SETUP.md`, and `docs/USER_MANUAL.md` now state that Google Calendar / Google Tasks sync is manual and task save does not auto-sync to Google services.
 
 ## What Changed In v2.3.2
 - OpenSpec proposal adopted: `openspec/changes/improve-save-load-mobile-task-sync/`.

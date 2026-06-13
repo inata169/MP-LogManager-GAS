@@ -50,6 +50,9 @@ Updated the live Google sync spec to preserve the deployed per-task Calendar opt
 ### Google Sync Spec Verification
 - `openspec validate --specs --strict --no-interactive`
 
+## Google Sync Documentation Follow-up
+Clarified in `README.md`, `docs/GOOGLE_SYNC_SETUP.md`, and `docs/USER_MANUAL.md` that Google Calendar / Google Tasks sync is manual: task save persists data to GAS / Google Drive but does not auto-sync to Google services.
+
 ## v2.3.2 Release Completed
 v2.3.2 was completed, validated, tagged, and released. This release stayed intentionally low risk: diagnostics and UX only, with no JSON schema changes, no top-level data structure changes, no GAS API contract changes, and no Calendar sync semantic changes.
 
