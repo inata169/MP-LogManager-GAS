@@ -20,7 +20,7 @@ v2.3.2-r5 was prepared as a small follow-up release for Calendar sync diagnostic
 
 ### r5 Verification
 - `openspec validate --specs --strict --no-interactive`
-- `openspec list` now leaves only `add-google-sync` active because it still has incomplete tasks.
+- `openspec list` now leaves only `add-google-sync` active because it is still `11/15 tasks`; the remaining 4 tasks must be reviewed before archive.
 
 ## v2.3.2 Release Completed
 v2.3.2 was completed, validated, tagged, and released. This release stayed intentionally low risk: diagnostics and UX only, with no JSON schema changes, no top-level data structure changes, no GAS API contract changes, and no Calendar sync semantic changes.
