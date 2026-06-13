@@ -1,7 +1,7 @@
 # Handover Context - 2026-06-13
 
 ## Current Status
-v2.3.2 is complete and released. `main` includes the v2.3.2-r5 follow-up patch for Calendar diagnostic toast styling. The `v2.3.2` tag has been pushed, and the GitHub Release was created manually on GitHub. The next release tag to create is `v2.3.2-r5`.
+v2.3.2 is complete and released. `main` includes the v2.3.2-r5 follow-up patch for Calendar diagnostic toast styling. The `v2.3.2` and `v2.3.2-r5` tags have been pushed. The `v2.3.2` GitHub Release was created manually on GitHub; the `v2.3.2-r5` GitHub Release still needs manual creation or an authenticated GitHub CLI session.
 
 ## v2.3.2-r5 Follow-up
 - Calendar manual sync diagnostics now use informational styling when GAS returns a readable result but Calendar visibility is not verified.
@@ -53,7 +53,7 @@ v2.3.2 is complete and released. `main` includes the v2.3.2-r5 follow-up patch f
 
 ## Suggested Next Work
 - Add developer setup documentation for Node/npm, GitHub CLI, and OpenSpec CLI.
-- Create or confirm the GitHub Release for `v2.3.2-r5` after the tag is pushed.
+- Create or confirm the GitHub Release for `v2.3.2-r5`.
 - Decide whether to archive `openspec/changes/improve-save-load-mobile-task-sync/`.
 - Plan larger v2.3.3+ work separately:
   - stable Calendar matching

@@ -42,7 +42,7 @@
 
 ## High Priority (Next)
 - [ ] **v2.3.2-r5 release finalization**
-  - [ ] Push `v2.3.2-r5` tag.
+  - [x] Push `v2.3.2-r5` tag.
   - [ ] Create or confirm GitHub Release `v2.3.2-r5`.
 
 - [ ] **Developer setup documentation**
