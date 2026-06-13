@@ -20,8 +20,11 @@
   - [x] Removed undeployed task-template behavior from current specs.
   - [x] Aligned large-data warnings with implemented save-time byte thresholds.
   - [x] Added deployed multi-entry Journal behavior to the current Journal spec.
+  - [x] Reconciled `add-google-sync` with deployed manual-sync behavior.
+  - [x] Archived `add-google-sync`.
+  - [x] Updated the current Google sync spec for settings, manual Calendar/Google Tasks sync, GAS setup/template endpoints, and no save-time auto-sync.
+  - [x] Verified `openspec validate add-google-sync --strict --no-interactive`.
   - [x] Verified `openspec validate --specs --strict --no-interactive`.
-  - [x] Left `add-google-sync` active because OpenSpec reports it as `11/15 tasks`, so it is not ready to archive.
 
 - [x] **v2.3.2 Release: Save/Load diagnostics, iPhone Tasks detail UX, and Calendar sync diagnostics** (released 2026-06-13)
   - [x] Adopted OpenSpec proposal: `improve-save-load-mobile-task-sync`.
@@ -56,11 +59,6 @@
   - [x] Moved persistence from GitHub data files to Google Drive through GAS.
 
 ## High Priority (Next)
-- [ ] **OpenSpec add-google-sync follow-up**
-  - [ ] Review the remaining `add-google-sync` tasks.
-  - [ ] Decide whether the 4 unchecked tasks are still required, already completed but unchecked, or obsolete.
-  - [ ] Archive `add-google-sync` only after it is complete and validated.
-
 - [ ] **Developer setup documentation**
   - [ ] Document recommended per-PC setup for Node.js LTS, npm, GitHub CLI, and OpenSpec CLI.
   - [ ] Decide whether to add `docs/DEV_SETUP.md` and/or `scripts/setup-dev.ps1`.
