@@ -362,3 +362,119 @@ const DataAPI = {
     }
 };
 
+DataAPI.SIZE_WARNING_BYTES = 500 * 1024;
+DataAPI.SIZE_HIGH_WARNING_BYTES = 1.5 * 1024 * 1024;
+DataAPI.SIZE_CRITICAL_BYTES = 3 * 1024 * 1024;
+DataAPI.lastMetrics = null;
+
+DataAPI._byteLength = function(text) {
+    if (typeof TextEncoder !== 'undefined') {
+        return new TextEncoder().encode(text || '').length;
+    }
+    return (text || '').length;
+};
+
+DataAPI._itemCount = function(data) {
+    return Array.isArray(data) ? data.length : 0;
+};
+
+DataAPI._estimatePayload = function(data) {
+    const started = performance.now();
+    const json = JSON.stringify(data);
+    return {
+        bytes: this._byteLength(json),
+        stringifyMs: performance.now() - started
+    };
+};
+
+DataAPI._recordMetric = function(metric) {
+    this.lastMetrics = {
+        ...metric,
+        jsonKB: Math.round((metric.jsonBytes / 1024) * 10) / 10,
+        timestamp: new Date().toISOString()
+    };
+    console.info('[DataAPI metrics]', this.lastMetrics);
+};
+
+DataAPI.getLargeDataWarning = function(type) {
+    const metric = this.lastMetrics;
+    if (!metric || metric.type !== type || !metric.jsonBytes) return null;
+    if (metric.jsonBytes >= this.SIZE_CRITICAL_BYTES) {
+        return `${type} data is about ${metric.jsonKB} KB. Save/load may become unreliable; consider cleanup or future archiving.`;
+    }
+    if (metric.jsonBytes >= this.SIZE_HIGH_WARNING_BYTES) {
+        return `${type} data is about ${metric.jsonKB} KB. Save/load may be noticeably slower.`;
+    }
+    if (metric.jsonBytes >= this.SIZE_WARNING_BYTES) {
+        return `${type} data is about ${metric.jsonKB} KB. Save/load may slow down as data grows.`;
+    }
+    return null;
+};
+
+const originalGasFetchData = gasAPI.fetchData.bind(gasAPI);
+gasAPI.fetchData = async function(type) {
+    const started = performance.now();
+    try {
+        const data = await originalGasFetchData(type);
+        const estimate = DataAPI._estimatePayload(data);
+        DataAPI._recordMetric({
+            operation: 'load',
+            type,
+            status: 'success',
+            itemCount: DataAPI._itemCount(data),
+            jsonBytes: estimate.bytes,
+            stringifyMs: estimate.stringifyMs,
+            fetchMs: performance.now() - started,
+            parseMs: 0,
+            totalMs: performance.now() - started
+        });
+        return data;
+    } catch (error) {
+        DataAPI._recordMetric({
+            operation: 'load',
+            type,
+            status: 'error',
+            itemCount: 0,
+            jsonBytes: 0,
+            stringifyMs: 0,
+            fetchMs: performance.now() - started,
+            parseMs: 0,
+            totalMs: performance.now() - started
+        });
+        throw error;
+    }
+};
+
+const originalGasUpdateData = gasAPI.updateData.bind(gasAPI);
+gasAPI.updateData = async function(type, data) {
+    const started = performance.now();
+    const estimate = DataAPI._estimatePayload({ type, data });
+    try {
+        const result = await originalGasUpdateData(type, data);
+        DataAPI._recordMetric({
+            operation: 'save',
+            type,
+            status: result?.status || 'success',
+            itemCount: DataAPI._itemCount(data),
+            jsonBytes: estimate.bytes,
+            stringifyMs: estimate.stringifyMs,
+            fetchMs: performance.now() - started - estimate.stringifyMs,
+            parseMs: 0,
+            totalMs: performance.now() - started
+        });
+        return result;
+    } catch (error) {
+        DataAPI._recordMetric({
+            operation: 'save',
+            type,
+            status: 'error',
+            itemCount: DataAPI._itemCount(data),
+            jsonBytes: estimate.bytes,
+            stringifyMs: estimate.stringifyMs,
+            fetchMs: performance.now() - started - estimate.stringifyMs,
+            parseMs: 0,
+            totalMs: performance.now() - started
+        });
+        throw error;
+    }
+};
