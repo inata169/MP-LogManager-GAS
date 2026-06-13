@@ -1,6 +1,6 @@
 # Daily Summary - 2026-06-13
 
-## v2.3.2-r5 Release Prepared
+## v2.3.2-r5 Release Completed
 v2.3.2-r5 was prepared as a small follow-up release for Calendar sync diagnostic feedback. The app behavior remains unchanged: readable GAS sync results that do not verify Calendar visibility are informational diagnostics, while fallback/CORS/unreadable responses remain warnings.
 
 ### r5 Completed Work
@@ -9,7 +9,6 @@ v2.3.2-r5 was prepared as a small follow-up release for Calendar sync diagnostic
 - Confirmed Service Worker cache name is `mp-logmanager-gas-v2-3-2-r5`.
 - Added `RELEASE_NOTES_v2.3.2-r5.md`.
 - Confirmed the `v2.3.2-r5` GitHub Release was created manually.
-- Archived completed OpenSpec changes and created live specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, `mobile-task-ux`, and `task-management`.
 
 ### r5 Constraints
 - No JSON schema or top-level data structure changes.
@@ -19,6 +18,16 @@ v2.3.2-r5 was prepared as a small follow-up release for Calendar sync diagnostic
 - Save still does not automatically sync Calendar events.
 
 ### r5 Verification
+- `node --check web/js/app.js`
+
+## Post-release OpenSpec Maintenance
+After the `v2.3.2-r5` tag and GitHub Release, completed OpenSpec changes were archived as repository maintenance. This happened after the release tag, so these archive commits are not part of the `v2.3.2-r5` tagged release contents.
+
+### OpenSpec Maintenance Completed
+- Archived completed OpenSpec changes and created live specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, `mobile-task-ux`, and `task-management`.
+- Left `add-google-sync` active because it is still `11/15 tasks`; the remaining 4 tasks must be reviewed before archive.
+
+### OpenSpec Maintenance Verification
 - `openspec validate --specs --strict --no-interactive`
 - `openspec list` now leaves only `add-google-sync` active because it is still `11/15 tasks`; the remaining 4 tasks must be reviewed before archive.
 
