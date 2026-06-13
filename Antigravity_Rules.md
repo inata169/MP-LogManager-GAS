@@ -1,129 +1,71 @@
-# Antigravity Development Protocol (Hiroki Edition)
+# Antigravity Development Protocol
 
-このドキュメントは、Antigravity（Claudeモデル）を用いて、日本語環境下で安定的かつ高速に開発を行うための絶対ルールです。
+This document contains project-specific workflow rules for AI assistants working on MP-LogManager-GAS.
 
----
+## 1. Read Order
+Before starting work, read these files when they exist:
 
-## 1. モデル戦略：「脳」と「手」の使い分け
+1. `AGENTS.md`
+2. `Antigravity_Rules.md`
+3. `99-handover_context.md`
+4. `Todo.md`
+5. Relevant OpenSpec files when the task mentions a proposal, plan, spec, architecture, performance, or larger behavior change
 
-Antigravityの動作が重くなる・言うことを聞かない原因は、「作業フェーズ」と「モデル」の不一致です。
+## 2. Encoding Rules
+This repository is developed on Windows/PowerShell, so encoding problems are easy to create.
 
-| フェーズ | 推奨モデル | 役割 | 理由 |
-|---|---|---|---|
-| 実装・修正・実行 | Claude 4.5 Sonnet | Developer (手) | **【基本は常時これ】** 高速、従順、エラー時に素直。日本語指示も完璧。ThinkingモードはOFF推奨。 |
-| 設計・難問相談 | Claude 4.5 Opus | Architect (脳) | **【ハマった時だけ】** 複雑なバグや設計相談のみ使用。※長考して重くなるため、解決したらSonnetに戻す。 |
+- Treat all project documentation as UTF-8.
+- Do not rewrite Japanese text through tools or shell commands that may reinterpret encoding.
+- Prefer `apply_patch` for manual edits.
+- After touching docs, check for common Japanese mojibake marker strings and replacement characters.
+- If mojibake is found in recently edited docs, clean it before committing.
 
----
+## 3. Git Safety
+- Do not include local-only tooling such as `.codex-tools/` in commits.
+- Do not revert user changes unless explicitly asked.
+- Before committing, verify the staged files are exactly the intended files.
+- Keep proposal/docs cleanup and implementation changes in separate commits when practical.
 
-## 2. 3時間ルール（セッション管理）
-
-チャットが長くなるとAIは「バカ」になり、PCは「重く」なります。
-
-- **賞味期限:** 1つのチャットは **90分〜3時間** が限界。
-- **重くなったら:** 粘らずに「引越し」をする。
-- **リセット:** `Ctrl + R` でブラウザをリロードし、メモリを解放する。
-
-### 引越し（Handover）プロンプト
-
-チャットを捨てる前に、以下の指示を投げて「記憶の引き継ぎ書」を作らせてください。
-
-> 「動作が重くなってきたのでリセットします。
-> 現在の進捗、保留中のタスク、直近で実行すべきコマンドをまとめた `99-handover_context.md` を作成してください。
-> 作成後、このチャットは終了します。」
-
----
-
-## 3. スタートアップ・プロンプト（毎回最初に貼る）
-
-新しいチャットを始めたら、まず以下のプロンプトを貼り付けて、AIを「Hirokiモード」に矯正してください。
-
-```markdown
-# Antigravity Control Protocol (Hiroki Mode)
-
-あなたは私の「専属実装エンジニア」です。以下のルールを厳守してください。
-
-## 1. Mindset: User First
-- **指示絶対:** 文書（todo.md等）とチャットの指示が矛盾した場合、**必ず「今のチャット指示」を優先**してください。
-- **Action Over Thought:** 実装フェーズでは、長々とした考察（Thinking）は不要です。最短手数で動くコードを出力してください。
-- **Stop Loop:** エラーが出た際、勝手に修正ループに入らず、一度停止して状況を報告してください。
-
-## 2. Windows/PowerShell Safety (Encoding Rules)
-Windows環境のため、標準出力を直接読むと文字化け・空文字になります。
-以下の手順以外でのコマンド実行を禁止します。
-
-- **Git:** システムメッセージを英語化するため、必ず `$env:LC_ALL='C';` を付与する。
-  ```powershell
-  $env:LC_ALL='C'; git status > _git_log.txt 2>&1
-  ```
-- **Python:** 日本語ログ対策のため、`$env:PYTHONUTF8=1;` を付与する。
-  ```powershell
-  $env:PYTHONUTF8=1; python script.py > _py_log.txt 2>&1
-  ```
-- **Output Check:** 結果は画面に出さず、必ずファイル(`> log.txt`)にリダイレクトし、`read_file` ツールで中身を確認すること。
-- **Output "Blindness":** 「出力が見えません」という言い訳は禁止。ファイル経由なら必ず見えます。
-
-## 3. Japanese Doc Handling
-- 仕様書やコミットメッセージは**日本語**で扱います。
-- `read_file` / `write_file` は常に **UTF-8** を使用してください。
-- Gitコミット時、文字化けを防ぐためメッセージファイル経由を推奨します。
-  ```powershell
-  
-  ```
-
-## 4. Workflow
-1. **Understand:** `99-handover_context.md` (あれば) と `todo.md` を読み、タスクを1つ提案。
-2. **Plan:** 実装方針を簡潔に提示（承認待ち）。
-3. **Execute:** 承認後、実装開始。
-```
-ルール通り、ファイルにリダイレクトして (`> log.txt`)、`read_file` で読んでください。
----
-
-### Q. 日本語コミットが文字化けする
-
-**A.** AIにメッセージファイルを作らせてコミットさせてください。
+## 4. OpenSpec Rules
+- Read `openspec/AGENTS.md` for proposal/spec work.
+- Validate active changes with:
 
 ```powershell
-# AIによる操作:
-# 1. write_file('_msg.txt', '修正内容: ○○機能の追加')
-# 2. 以下のコマンドを実行
-$env:LC_ALL='C'; git commit -F _msg.txt
+openspec validate <change-id> --strict --no-interactive
 ```
 
-**注意**: ローカルの`git log`では文字化けして見えますが、**GitHubリポジトリでは正しく表示されます**。これはPowerShellの表示の問題であり、Gitリポジトリ自体には正しくUTF-8で保存されています。
+- If OpenSpec CLI is not installed globally, use the local or portable toolchain only as a workspace aid; do not commit portable binaries.
 
-## 4. トラブルシューティング
+## 5. Release Checklist
+For release work:
 
-### Q. 「出力が空です」「読めません」と言われた
+- Update release notes.
+- Run relevant syntax checks and OpenSpec validation.
+- Confirm manual browser checks when user-facing behavior changed.
+- Tag the release.
+- Create or confirm the GitHub Release.
+- Update `99-daily-summary.md`, `99-handover_context.md`, and `Todo.md`.
 
-**A.** AIがルールをサボって標準出力を読もうとしています。こう叱ってください：
+## 6. Handover Checklist
+At the end of substantial work, update:
 
-> 「ルール通り、ファイルにリダイレクトして (`> log.txt`)、`read_file` で読んでください。」
+- `99-daily-summary.md`
+- `99-handover_context.md`
+- `Todo.md`
 
-### Q. Gitの日本語ファイル名が `\343\...` になる
+The handover should include:
 
-**A.** ターミナルで一度だけ以下を実行してください（AIではなく人間が実行）。
+- what changed
+- what was verified
+- what constraints were preserved
+- what remains next
+- any local-only tooling or environment notes
 
-```powershell
-git config --global core.quotepath false
-```
+## 7. v2.3.2 Constraints To Remember
+For the v2.3.2 line:
 
-### Q. 日本語コミットが文字化けする
-
-**A.** AIにメッセージファイルを作らせてコミットさせてくださいgit commit -F _commit_msg.txt。
-
-```powershell
-# AIによる操作:
-# 1. write_file('_msg.txt', '修正内容: ○○機能の追加')
-# 2. 以下のコマンドを実行
-$env:LC_ALL='C'; git commit -F _msg.txt
-```
-
----
-
-## 5. 作業終了時（Finish）
-
-一日の終わり、またはセッション終了時には以下を実施してください。
-
-- **Docs Update:** `todo.md` / `99-daily-summary.md` / `openspec文書` 99-handover_context.md の更新（日本語）。
-- **Git:** 変更のコミット（プッシュは確認してから）。
-- **Clean up:** 一時ファイル（`_git_log.txt` や `_msg.txt`）の削除。
+- Do not change the JSON schema or top-level data structure.
+- Do not change the GAS API contract.
+- Do not change Calendar sync semantics.
+- Do not implement stable Calendar event matching, Calendar event ID persistence, upsert behavior, deduplication, JSON splitting, differential save, or archive migration.
+- Save does not automatically sync Calendar events; manual sync remains required.

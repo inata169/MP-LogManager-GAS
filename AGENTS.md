@@ -1,3 +1,18 @@
+<!-- PROJECT:START -->
+# Project Instructions
+
+Before working in this repository, always read `Antigravity_Rules.md`.
+
+Use `Antigravity_Rules.md` for:
+- project-specific workflow expectations
+- Windows/PowerShell encoding precautions
+- handover and documentation update rules
+- release/finish checklist expectations
+
+Keep this project block outside the OpenSpec managed block.
+
+<!-- PROJECT:END -->
+
 <!-- OPENSPEC:START -->
 # OpenSpec Instructions
 
