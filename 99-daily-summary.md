@@ -37,6 +37,13 @@ After the `v2.3.2-r5` tag and GitHub Release, completed OpenSpec changes were ar
 - `openspec validate add-google-sync --strict --no-interactive`
 - `openspec list` now reports no active changes.
 
+## Developer Setup Documentation
+Added `docs/DEV_SETUP.md` to document per-PC setup for Git, Node.js LTS, GitHub CLI, OpenSpec CLI, validation commands, local-only `.codex-tools/`, and Windows/PowerShell UTF-8 precautions.
+
+### Developer Setup Verification
+- Confirmed `.codex-tools/` remains ignored in `.gitignore`.
+- Checked merged cleanup branches were removed locally and from `origin`.
+
 ## v2.3.2 Release Completed
 v2.3.2 was completed, validated, tagged, and released. This release stayed intentionally low risk: diagnostics and UX only, with no JSON schema changes, no top-level data structure changes, no GAS API contract changes, and no Calendar sync semantic changes.
 

@@ -70,10 +70,10 @@ The following OpenSpec archive work happened after the `v2.3.2-r5` tag and GitHu
 ## Local Workspace Notes
 - `.codex-tools/` exists locally and contains portable `node`, `npm`, `gh`, and OpenSpec CLI tooling.
 - `.codex-tools/` is intentionally not committed because it is PC-specific and large.
-- For multi-PC development, prefer installing Node.js LTS, GitHub CLI, and OpenSpec CLI on each PC, or add a future `docs/DEV_SETUP.md` / setup script.
+- Added `docs/DEV_SETUP.md` for recommended per-PC setup, validation commands, local-only tooling, and Windows/PowerShell UTF-8 precautions.
+- Removed merged cleanup branches `codex-fix-openspec-review-docs` and `codex-archive-add-google-sync` locally and from `origin`.
 
 ## Suggested Next Work
-- Add developer setup documentation for Node/npm, GitHub CLI, and OpenSpec CLI.
 - Plan larger v2.3.3+ work separately:
   - stable Calendar matching
   - event ID persistence

@@ -1,6 +1,14 @@
 # Todo List - Current Status (2026-06-13)
 
 ## Completed
+- [x] **Developer setup documentation** (2026-06-13)
+  - [x] Added `docs/DEV_SETUP.md` for per-PC setup.
+  - [x] Documented Git, Node.js LTS, GitHub CLI, and OpenSpec CLI checks.
+  - [x] Documented common validation commands and local portable OpenSpec fallback.
+  - [x] Documented `.codex-tools/` as local-only and confirmed it remains ignored.
+  - [x] Documented Windows/PowerShell UTF-8 precautions.
+  - [x] Removed merged cleanup branches locally and from `origin`.
+
 - [x] **v2.3.2-r5 Calendar diagnostic styling follow-up** (2026-06-13)
   - [x] Changed readable-but-unverified Calendar sync diagnostics to informational feedback instead of success feedback.
   - [x] Kept fallback/CORS/unreadable Calendar sync diagnostics as warnings.
@@ -59,11 +67,6 @@
   - [x] Moved persistence from GitHub data files to Google Drive through GAS.
 
 ## High Priority (Next)
-- [ ] **Developer setup documentation**
-  - [ ] Document recommended per-PC setup for Node.js LTS, npm, GitHub CLI, and OpenSpec CLI.
-  - [ ] Decide whether to add `docs/DEV_SETUP.md` and/or `scripts/setup-dev.ps1`.
-  - [ ] Keep `.codex-tools/` local-only; do not commit portable binaries.
-
 - [ ] **v2.3.3+ planning**
   - [ ] Stable Calendar event matching.
   - [ ] Calendar event ID persistence.
