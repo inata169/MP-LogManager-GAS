@@ -9,10 +9,16 @@
   - [x] Preserved v2.3.2 constraints: no data schema, GAS contract, or Calendar sync semantic changes.
   - [x] Confirmed GitHub Release `v2.3.2-r5` was created manually.
 
-- [x] **OpenSpec archive: improve-save-load-mobile-task-sync** (2026-06-13)
-  - [x] Archived the completed change under `openspec/changes/archive/2026-06-13-improve-save-load-mobile-task-sync/`.
-  - [x] Created live specs for `data-performance`, `google-sync`, and `mobile-task-ux`.
+- [x] **OpenSpec archive: completed changes** (2026-06-13)
+  - [x] Archived `improve-save-load-mobile-task-sync`.
+  - [x] Archived `multi-entry-journal`.
+  - [x] Archived `automated-mobile-sync`.
+  - [x] Archived `add-journal-rich-editor`.
+  - [x] Archived `add-task-templates`.
+  - [x] Archived `add-compact-responsive-layout`.
+  - [x] Created live specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, `mobile-task-ux`, and `task-management`.
   - [x] Verified `openspec validate --specs --strict --no-interactive`.
+  - [x] Left `add-google-sync` active because it still has incomplete tasks.
 
 - [x] **v2.3.2 Release: Save/Load diagnostics, iPhone Tasks detail UX, and Calendar sync diagnostics** (released 2026-06-13)
   - [x] Adopted OpenSpec proposal: `improve-save-load-mobile-task-sync`.

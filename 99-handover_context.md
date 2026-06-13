@@ -9,8 +9,15 @@ v2.3.2 is complete and released. `main` includes the v2.3.2-r5 follow-up patch f
 - Web asset query strings are `v2.3.2-r5`.
 - Service Worker cache name is `mp-logmanager-gas-v2-3-2-r5`.
 - Added `RELEASE_NOTES_v2.3.2-r5.md`.
-- Archived OpenSpec change `improve-save-load-mobile-task-sync` to `openspec/changes/archive/2026-06-13-improve-save-load-mobile-task-sync/`.
-- Created live OpenSpec specs for `data-performance`, `google-sync`, and `mobile-task-ux`.
+- Archived completed OpenSpec changes:
+  - `improve-save-load-mobile-task-sync`
+  - `multi-entry-journal`
+  - `automated-mobile-sync`
+  - `add-journal-rich-editor`
+  - `add-task-templates`
+  - `add-compact-responsive-layout`
+- Created live OpenSpec specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, `mobile-task-ux`, and `task-management`.
+- `add-google-sync` remains active because it still has incomplete tasks.
 - No app data format, GAS contract, or Calendar sync semantic changes were made.
 
 ## What Changed In v2.3.2
@@ -34,6 +41,7 @@ v2.3.2 is complete and released. `main` includes the v2.3.2-r5 follow-up patch f
 - v2.3.2-r5: `node --check web/js/app.js`
 - `openspec validate improve-save-load-mobile-task-sync --strict --no-interactive`
 - `openspec validate --specs --strict --no-interactive`
+- `openspec list`
 - Manual browser verification:
   - Tasks save OK.
   - Journal save OK.
