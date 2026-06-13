@@ -21,11 +21,13 @@ The following OpenSpec archive work happened after the `v2.3.2-r5` tag and GitHu
   - `add-journal-rich-editor`
   - `add-task-templates`
   - `add-compact-responsive-layout`
+  - `add-google-sync`
 - Created live OpenSpec specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, and `mobile-task-ux`.
 - Removed the archived-but-undeployed task-template requirement from current specs; `add-task-templates` remains archived documentation only until the Web App implements templates.
 - Tightened `data-performance` large-data warnings to the implemented save-time byte-threshold behavior.
 - Added the deployed multi-entry Journal behavior to the live Journal spec.
-- `add-google-sync` remains active because OpenSpec reports it as `11/15 tasks`; it should not be archived until the remaining 4 tasks are resolved, marked obsolete, or explicitly completed.
+- Reconciled `add-google-sync` with the deployed manual-sync behavior and archived it.
+- The live Google sync spec now covers settings, manual Calendar/Google Tasks sync requests, GAS setup/template endpoints, and that task save does not auto-sync.
 
 ## What Changed In v2.3.2
 - OpenSpec proposal adopted: `openspec/changes/improve-save-load-mobile-task-sync/`.
@@ -47,6 +49,7 @@ The following OpenSpec archive work happened after the `v2.3.2-r5` tag and GitHu
 - `node --check web/js/journal.js`
 - v2.3.2-r5: `node --check web/js/app.js`
 - `openspec validate improve-save-load-mobile-task-sync --strict --no-interactive`
+- `openspec validate add-google-sync --strict --no-interactive`
 - `openspec validate --specs --strict --no-interactive`
 - `openspec list`
 - Manual browser verification:
@@ -70,7 +73,6 @@ The following OpenSpec archive work happened after the `v2.3.2-r5` tag and GitHu
 - For multi-PC development, prefer installing Node.js LTS, GitHub CLI, and OpenSpec CLI on each PC, or add a future `docs/DEV_SETUP.md` / setup script.
 
 ## Suggested Next Work
-- Review `openspec/changes/add-google-sync/tasks.md`; resolve the remaining 4 unchecked tasks before archiving `add-google-sync`.
 - Add developer setup documentation for Node/npm, GitHub CLI, and OpenSpec CLI.
 - Plan larger v2.3.3+ work separately:
   - stable Calendar matching
