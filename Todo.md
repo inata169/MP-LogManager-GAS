@@ -16,7 +16,10 @@
   - [x] Archived `add-journal-rich-editor`.
   - [x] Archived `add-task-templates`.
   - [x] Archived `add-compact-responsive-layout`.
-  - [x] Created live specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, `mobile-task-ux`, and `task-management`.
+  - [x] Created live specs for `data-performance`, `google-sync`, `journal`, `journal-layout`, and `mobile-task-ux`.
+  - [x] Removed undeployed task-template behavior from current specs.
+  - [x] Aligned large-data warnings with implemented save-time byte thresholds.
+  - [x] Added deployed multi-entry Journal behavior to the current Journal spec.
   - [x] Verified `openspec validate --specs --strict --no-interactive`.
   - [x] Left `add-google-sync` active because OpenSpec reports it as `11/15 tasks`, so it is not ready to archive.
 

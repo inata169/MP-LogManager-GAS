@@ -1,51 +1,76 @@
 # Project Context
 
 ## Purpose
-MP-LogManager は、医学物理士のタスク管理、日報生成、およびデータの同期を目的とした統合プラットフォームです。
-**Web App (PWA)** をメインインターフェースとし、外出先（iPhone/iPad等）からの入力を可能にしつつ、デスクトップ版（Python）での高度な集計・管理をサポートします。
+MP-LogManager (GAS Edition) is a task and journal management application for medical physics workflows.
+The primary interface is the Web App/PWA, designed for daily entry from PC browsers and iPhone/iPad.
+Personal Tasks and Journal data are stored in the user's own Google Drive through Google Apps Script (GAS), not in GitHub.
 
 ## Tech Stack
-### Web App (Main)
-- **Framework**: Vanilla JS / HTML5 / CSS3 (Fixed layout for Mobile/PWA)
-- **Libraries**: EasyMDE (Editor), marked.js (Markdown), highlight.js (Code)
-- **Deployment**: GitHub Pages (PWA対応)
-- **Backend (Storage)**: 
-    - **Google Apps Script (GAS) API**: Google Drive へのデータ保存 (MP-LogManager-GAS Edition)
-    - **GitHub API**: リポジトリ設定などの非機密情報の管理用
-- **Security**: 個人データ（Journal/Tasks）の GitHub 上への非保存（GAS連携利用時）
-- **Stability**: 通信リトライ、タイムアウト制御、iOS最適化（Safari対応）
 
-### Desktop App (Sub)
-- **Status**: 廃止 (Ver 2.1.0 移行完了)
-- **Note**: 全機能が Web App + GAS 連携へ統合されました。
+### Web App (Main)
+- **Framework**: Vanilla JavaScript, HTML5, CSS3
+- **UI target**: PC browser, mobile browser, and PWA usage
+- **Libraries**: EasyMDE, marked.js, highlight.js
+- **Deployment**: GitHub Pages
+- **Backend/storage**: Google Apps Script API writing JSON data in Google Drive
+- **Repository role**: Hosts app code, setup docs, OpenSpec files, and non-sensitive project metadata
+
+### Google Apps Script Backend
+- Stores Tasks and Journal JSON files in Google Drive.
+- Handles GAS connectivity checks and persistence requests.
+- Provides Google Calendar and Google Tasks sync endpoints where enabled.
+- Requires manual authorization in the GAS editor after setup.
+
+### Desktop App (Legacy)
+- The old Python/CustomTkinter desktop app is no longer the primary product.
+- Keep legacy references only when they are needed for migration history or archived documentation.
 
 ## Project Conventions
 
 ### Code Style
-- PEP 8 準拠
-- UTF-8 エンコーディング必須 (特に Windows 環境)
-- 日本語コメント・ドキュメントを許容
+- Keep JavaScript simple and framework-free unless a proposal explicitly approves a larger change.
+- Preserve UTF-8 for all documentation and source files.
+- Japanese user-facing text and documentation are allowed, but be careful on Windows/PowerShell.
+- Prefer existing module boundaries under `web/js/` and avoid broad rewrites for narrow fixes.
 
 ### Architecture Patterns
-- GUI-First: ユーザーインターフェースを起点とした機能設計
-- Manager パターン: `TaskManager` などのクラスによるデータ操作の抽象化
-- Module-based: `gui/`, `models.py`, `database.py` などに責務を分離
+- Web App first: new user-facing behavior should fit the PWA flow.
+- GAS contract stability matters: do not change request/response semantics without an approved spec.
+- Persistence is full-file JSON save/load through GAS and Google Drive unless a future proposal changes it.
+- Calendar sync is manual unless a specific approved change says otherwise.
 
 ### Testing Strategy
-- 手動検証および検証用スクリプト (`verify_*.py`) による動作確認
+- Run syntax checks for changed JavaScript files with `node --check`.
+- Run OpenSpec validation for spec/proposal changes.
+- Use manual browser checks for user-facing Web App behavior.
+- Keep release and handover notes in sync after substantial work.
 
 ### Git Workflow
-- `$env:LC_ALL='C';` を付与したコマンド実行 (文字化け防止)
-- 日本語コミットメッセージ
+- Do not commit local-only tooling such as `.codex-tools/`.
+- Do not revert user changes unless explicitly asked.
+- Keep docs/spec cleanup separate from implementation changes when practical.
+- On Windows/PowerShell, avoid commands that can reinterpret Japanese text or file encodings.
 
 ## Domain Context
-- 医療ログ（マルチパス型）: 患者ID、タスク内容、完了ステータス、日報（Journal）などの概念を持つ。
-- PHI (Protected Health Information): 患者の個人情報の取り扱いに注意が必要。
+- Core entities are Tasks and Journal entries.
+- Tasks may include category, priority, due date, status, details, and optional Google sync settings.
+- Journal supports multiple entries per date with title, content, ID, and created timestamp.
+- The app may be used around medical work, so avoid storing patient-identifying or sensitive personal data in GitHub.
 
 ## Important Constraints
-- Windows パスとエンコーディング (UTF-8)
-- 外部コマンド実行時のリダイレクト必須
+- Current v2.3.2-line constraints:
+  - Do not change the JSON schema or top-level data structure.
+  - Do not change the GAS API contract.
+  - Do not change Calendar sync semantics.
+  - Do not implement stable Calendar event matching, event ID persistence, upsert behavior, deduplication, JSON splitting, differential save, or archive migration without a separate approved proposal.
+  - Save does not automatically sync Calendar events; manual sync remains required.
+- Keep current OpenSpec specs aligned with deployed behavior.
+- Keep archived proposals as history; do not treat archived-only behavior as live product behavior unless it exists in the app.
 
 ## External Dependencies
-- `customtkinter`
-- `pandas`
+- EasyMDE
+- marked.js
+- highlight.js
+- Google Apps Script
+- Google Drive
+- Optional Google Calendar and Google Tasks services
