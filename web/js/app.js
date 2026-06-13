@@ -192,6 +192,8 @@ function initModals() {
             html += `</ul>`;
             
             if (result.ok) {
+                html += `<div class="diag-summary success">GAS ping OK. This confirms basic GAS connectivity only; Calendar sync still requires a manual sync check.</div>`;
+                showToast('GAS ping OK. Calendar sync is not verified yet.', 'success', 5000);
                 html += `<div class="diag-summary success">✅ 接続に成功しました。設定を保存してリロードしてください。</div>`;
                 showToast('接続成功！', 'success');
             } else {
@@ -360,9 +362,16 @@ function initSync() {
         try {
             showToast('Google と同期中...', 'info');
             const syncResults = [];
+            const calendarStats = {
+                eligible: tasksData.filter(t => t.sync_calendar !== false && t.status !== 'DONE' && t.due_date).length,
+                skippedNoDate: tasksData.filter(t => t.sync_calendar !== false && t.status !== 'DONE' && !t.due_date).length,
+                skippedPerTaskOff: tasksData.filter(t => t.sync_calendar === false && t.status !== 'DONE').length,
+                completedExcluded: tasksData.filter(t => t.status === 'DONE').length
+            };
             
             if (localStorage.getItem('sync_calendar') === 'true') {
                 console.log('Manual sync: Calendar...');
+                showToast(`Calendar sync check: ${calendarStats.eligible} sent, ${calendarStats.skippedNoDate} no due date, ${calendarStats.skippedPerTaskOff} per-task off, ${calendarStats.completedExcluded} completed excluded.`, 'info', 6000);
                 syncResults.push(DataAPI.syncCalendar(tasksData).then(r => ({ type: 'Calendar', ...r })));
             }
             if (localStorage.getItem('sync_gtasks') === 'true') {

@@ -196,9 +196,16 @@ async function saveJournal() {
 async function saveJournals() {
     try {
         showLoading(true);
+        showToast('Saving journal to GAS...', 'info', 1200);
         const result = await DataAPI.updateJournals(journalsData);
         if (result.content && result.content.sha) {
             journalsSha = result.content.sha;
+        }
+        showToast('Journal saved.', 'success', 1800);
+
+        const sizeWarning = DataAPI.getLargeDataWarning('journals');
+        if (sizeWarning) {
+            showToast(sizeWarning, 'warning', 6000);
         }
         renderJournals();
     } catch (error) {

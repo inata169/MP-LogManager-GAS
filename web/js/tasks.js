@@ -214,9 +214,16 @@ async function deleteTask(taskId) {
 async function saveTasks() {
     try {
         showLoading(true);
+        showToast('Saving tasks to GAS...', 'info', 1200);
         const result = await DataAPI.updateTasks(tasksData);
         if (result.content && result.content.sha) {
             tasksSha = result.content.sha;
+        }
+        showToast('Tasks saved.', 'success', 1800);
+
+        const sizeWarning = DataAPI.getLargeDataWarning('tasks');
+        if (sizeWarning) {
+            showToast(sizeWarning, 'warning', 6000);
         }
 
         // [v2.2.5] 日付なしタスクへの警告
