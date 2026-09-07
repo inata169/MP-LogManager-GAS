@@ -6,7 +6,7 @@ let isManualSyncRunning = false;
 
 // アプリ初期化
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('MP-LogManager Web App v2.2.5 (Optimization & Fix) loading...');
+    console.log('MP-LogManager Web App v2.3.3 loading...');
     initTheme();
     initNavigation();
     initModals();
@@ -216,7 +216,13 @@ function initModals() {
  * モーダル表示
  */
 function showModal(modalId) {
-    document.getElementById(modalId).classList.add('active');
+    const modal = document.getElementById(modalId);
+    modal.classList.add('active');
+
+    // 前回閉じた位置ではなく、常にフォーム先頭から表示する
+    modal.querySelectorAll('.modal-content, .modal-body').forEach(element => {
+        element.scrollTop = 0;
+    });
 }
 
 /**

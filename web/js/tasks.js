@@ -5,6 +5,17 @@
 let tasksData = [];
 let tasksSha = '';
 let currentEditingTaskId = null;
+let taskDetailsMode = 'edit';
+let taskPreviewTimer = null;
+
+const TASK_PREVIEW_DEBOUNCE_MS = 150;
+const TASK_MARKDOWN_SANITIZE_CONFIG = {
+    USE_PROFILES: { html: true },
+    FORBID_TAGS: ['script', 'style', 'form', 'button', 'textarea', 'select', 'option', 'iframe', 'object', 'embed', 'link', 'meta'],
+    FORBID_ATTR: ['style'],
+    ALLOW_DATA_ATTR: false,
+    SANITIZE_NAMED_PROPS: true
+};
 
 /**
  * Tasks読み込み
@@ -119,6 +130,108 @@ async function toggleTaskStatus(taskId) {
     await saveTasks();
 }
 
+function clearTaskPreviewTimer() {
+    if (taskPreviewTimer) {
+        clearTimeout(taskPreviewTimer);
+        taskPreviewTimer = null;
+    }
+}
+
+function showTaskPreviewMessage(message) {
+    const preview = document.getElementById('task-details-preview-panel');
+    preview.replaceChildren();
+
+    const emptyMessage = document.createElement('p');
+    emptyMessage.className = 'task-details-preview-empty';
+    emptyMessage.textContent = message;
+    preview.appendChild(emptyMessage);
+}
+
+function renderTaskDetailsPreview() {
+    const source = document.getElementById('task-details').value;
+    const preview = document.getElementById('task-details-preview-panel');
+
+    if (!source.trim()) {
+        showTaskPreviewMessage('プレビューする内容がありません');
+        return;
+    }
+
+    const rendered = renderMarkdown(source);
+    if (!rendered.trim()) {
+        showTaskPreviewMessage('安全に表示できる内容がありません');
+        return;
+    }
+
+    preview.innerHTML = rendered;
+}
+
+function scheduleTaskDetailsPreview() {
+    clearTaskPreviewTimer();
+    if (taskDetailsMode !== 'preview') return;
+
+    taskPreviewTimer = setTimeout(() => {
+        taskPreviewTimer = null;
+        if (taskDetailsMode === 'preview') {
+            renderTaskDetailsPreview();
+        }
+    }, TASK_PREVIEW_DEBOUNCE_MS);
+}
+
+function setTaskDetailsMode(mode, { focusTab = false } = {}) {
+    const nextMode = mode === 'preview' ? 'preview' : 'edit';
+    const editPanel = document.getElementById('task-details-edit-panel');
+    const previewPanel = document.getElementById('task-details-preview-panel');
+    const tabs = document.querySelectorAll('.task-details-tab');
+
+    clearTaskPreviewTimer();
+    taskDetailsMode = nextMode;
+
+    tabs.forEach(tab => {
+        const isSelected = tab.dataset.taskDetailsMode === nextMode;
+        tab.setAttribute('aria-selected', String(isSelected));
+        tab.tabIndex = isSelected ? 0 : -1;
+
+        if (isSelected && focusTab) {
+            tab.focus();
+        }
+    });
+
+    editPanel.hidden = nextMode !== 'edit';
+    previewPanel.hidden = nextMode !== 'preview';
+
+    if (nextMode === 'preview') {
+        renderTaskDetailsPreview();
+    }
+}
+
+function resetTaskDetailsEditor(source = '') {
+    clearTaskPreviewTimer();
+    document.getElementById('task-details').value = source == null ? '' : String(source);
+    document.getElementById('task-details-preview-panel').replaceChildren();
+    setTaskDetailsMode('edit');
+}
+
+function handleTaskDetailsTabKeydown(event) {
+    const tabs = Array.from(document.querySelectorAll('.task-details-tab'));
+    const currentIndex = tabs.indexOf(document.activeElement);
+    if (currentIndex < 0) return;
+
+    let nextIndex = null;
+    if (event.key === 'ArrowRight') {
+        nextIndex = (currentIndex + 1) % tabs.length;
+    } else if (event.key === 'ArrowLeft') {
+        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    } else if (event.key === 'Home') {
+        nextIndex = 0;
+    } else if (event.key === 'End') {
+        nextIndex = tabs.length - 1;
+    }
+
+    if (nextIndex == null) return;
+    event.preventDefault();
+    setTaskDetailsMode(tabs[nextIndex].dataset.taskDetailsMode, { focusTab: true });
+}
+
 /**
  * 新規タスクモーダルを開く
  */
@@ -129,7 +242,7 @@ function openAddTaskModal() {
     document.getElementById('task-category').value = 'Planning';
     document.getElementById('task-priority').value = 'Medium';
     document.getElementById('task-due-date').value = '';
-    document.getElementById('task-details').value = '';
+    resetTaskDetailsEditor();
     document.getElementById('task-sync-calendar').checked = true; // デフォルトはON
     showModal('task-modal');
 }
@@ -147,7 +260,7 @@ function openEditTaskModal(taskId) {
     document.getElementById('task-category').value = task.category;
     document.getElementById('task-priority').value = task.priority;
     document.getElementById('task-due-date').value = task.due_date || '';
-    document.getElementById('task-details').value = task.details || '';
+    resetTaskDetailsEditor(task.details);
     document.getElementById('task-sync-calendar').checked = task.sync_calendar !== false; // 明示的に false でなければ ON
     showModal('task-modal');
 }
@@ -157,6 +270,7 @@ function openEditTaskModal(taskId) {
  */
 async function saveTask() {
     const title = document.getElementById('task-title').value.trim();
+    const detailsSource = document.getElementById('task-details').value;
     if (!title) {
         showToast('タイトルを入力してください', 'warning');
         return;
@@ -167,7 +281,7 @@ async function saveTask() {
         category: document.getElementById('task-category').value,
         priority: document.getElementById('task-priority').value,
         due_date: document.getElementById('task-due-date').value || null,
-        details: document.getElementById('task-details').value.trim() || null,
+        details: detailsSource.trim() ? detailsSource : null,
         sync_calendar: document.getElementById('task-sync-calendar').checked
     };
 
@@ -188,6 +302,7 @@ async function saveTask() {
     }
 
     await saveTasks();
+    clearTaskPreviewTimer();
     hideModal('task-modal');
 }
 
@@ -358,15 +473,22 @@ function renderMarkdown(text) {
         // markedオブジェクトを確実に取得
         const markedObj = (typeof window !== 'undefined' && window.marked) ? window.marked : (typeof marked !== 'undefined' ? marked : null);
 
-        if (markedObj && typeof markedObj.parse === 'function') {
-            return markedObj.parse(prepText, { breaks: true });
-        } else {
-            console.warn('marked is not loaded properly. Falling back to plain text.');
+        const purifier = (typeof window !== 'undefined' && window.DOMPurify)
+            ? window.DOMPurify
+            : (typeof DOMPurify !== 'undefined' ? DOMPurify : null);
+
+        if (markedObj && typeof markedObj.parse === 'function'
+            && purifier && purifier.isSupported === true
+            && typeof purifier.sanitize === 'function') {
+            const renderedHtml = markedObj.parse(prepText, { breaks: true });
+            return purifier.sanitize(renderedHtml, TASK_MARKDOWN_SANITIZE_CONFIG);
         }
+
+        console.error('Safe Markdown renderer is unavailable. Falling back to plain text.');
     } catch (e) {
         console.error("Markdown parse error:", e);
     }
-    return escapeHtml(text);
+    return escapeHtml(text).replace(/\r?\n/g, '<br>');
 }
 
 // イベントリスナー
@@ -376,6 +498,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('hide-completed').addEventListener('change', renderTasks);
     document.getElementById('filter-category').addEventListener('change', renderTasks);
     document.getElementById('task-search').addEventListener('input', renderTasks);
+    document.getElementById('task-details').addEventListener('input', scheduleTaskDetailsPreview);
+
+    document.querySelectorAll('.task-details-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            setTaskDetailsMode(tab.dataset.taskDetailsMode);
+        });
+    });
+    document.querySelector('.task-details-tabs').addEventListener('keydown', handleTaskDetailsTabKeydown);
 
     // ソートUIの初期化
     const sortSelect = document.getElementById('sort-tasks');

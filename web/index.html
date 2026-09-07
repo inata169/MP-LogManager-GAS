@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a2e">
     <title>MP-LogManager</title>
-    <link rel="stylesheet" href="css/style.css?v=2.3.2-r5">
+    <link rel="stylesheet" href="css/style.css?v=2.3.3">
     <link rel="stylesheet" id="hljs-theme-light" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" id="hljs-theme-dark" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" disabled>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
@@ -136,15 +136,15 @@
     </nav>
 
     <!-- Task Modal -->
-    <div id="task-modal" class="modal">
+    <div id="task-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modal-title">新規タスク</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close" type="button" aria-label="閉じる">&times;</button>
             </div>
             <div class="modal-body">
-                <input type="text" id="task-title" class="input" placeholder="タイトル" required>
-                <select id="task-category" class="input">
+                <input type="text" id="task-title" class="input" placeholder="タイトル" aria-label="タイトル" required>
+                <select id="task-category" class="input" aria-label="カテゴリ">
                     <option value="QA">QA</option>
                     <option value="Planning">Planning</option>
                     <option value="Treatment Planning">Treatment Planning</option>
@@ -153,13 +153,34 @@
                     <option value="Meeting">Meeting</option>
                     <option value="Other">Other</option>
                 </select>
-                <select id="task-priority" class="input">
+                <select id="task-priority" class="input" aria-label="優先度">
                     <option value="High">High</option>
                     <option value="Medium" selected>Medium</option>
                     <option value="Low">Low</option>
                 </select>
-                <input type="date" id="task-due-date" class="input">
-                <textarea id="task-details" class="input textarea" placeholder="詳細" rows="8"></textarea>
+                <input type="date" id="task-due-date" class="input" aria-label="期限">
+                <div class="task-details-editor">
+                    <div class="task-details-toolbar">
+                        <div class="task-details-tabs" role="tablist" aria-label="タスク詳細の表示切り替え" aria-orientation="horizontal">
+                            <button id="task-details-edit-tab" class="task-details-tab" type="button" role="tab"
+                                aria-selected="true" aria-controls="task-details-edit-panel" tabindex="0"
+                                data-task-details-mode="edit">編集</button>
+                            <button id="task-details-preview-tab" class="task-details-tab" type="button" role="tab"
+                                aria-selected="false" aria-controls="task-details-preview-panel" tabindex="-1"
+                                data-task-details-mode="preview">プレビュー</button>
+                        </div>
+                        <span id="task-details-help" class="task-details-help">Markdown対応</span>
+                    </div>
+                    <div id="task-details-edit-panel" class="task-details-panel" role="tabpanel"
+                        aria-labelledby="task-details-edit-tab">
+                        <label class="visually-hidden" for="task-details">タスク詳細（Markdown）</label>
+                        <textarea id="task-details" class="input textarea" placeholder="詳細" rows="8"
+                            aria-describedby="task-details-help"></textarea>
+                    </div>
+                    <div id="task-details-preview-panel"
+                        class="task-details-panel task-details-preview markdown-body" role="tabpanel"
+                        aria-labelledby="task-details-preview-tab" tabindex="0" hidden></div>
+                </div>
                 <div class="modal-options" style="margin-top: 10px; padding: 5px;">
                     <label class="checkbox-container" style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
                         <input type="checkbox" id="task-sync-calendar" checked style="width: 18px; height: 18px;">
@@ -168,8 +189,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="save-task" class="btn btn-primary">保存</button>
-                <button class="btn btn-secondary modal-close">キャンセル</button>
+                <button id="save-task" class="btn btn-primary" type="button">保存</button>
+                <button class="btn btn-secondary modal-close" type="button">キャンセル</button>
             </div>
         </div>
     </div>
@@ -241,12 +262,14 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js?v=20260227"></script>
+    <script src="vendor/dompurify/purify.min.js"
+        integrity="sha384-46dPGH1XlTmj7bc50bqLjTdORXs/3EP2QpA/6EWbelYWOY9VGp+87RT61S3Mcslb"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
-    <script src="js/api.js?v=2.3.2-r5"></script>
-    <script src="js/tasks.js?v=2.3.2-r5"></script>
-    <script src="js/journal.js?v=2.3.2-r5"></script>
-    <script src="js/app.js?v=2.3.2-r5"></script>
+    <script src="js/api.js?v=2.3.3"></script>
+    <script src="js/tasks.js?v=2.3.3"></script>
+    <script src="js/journal.js?v=2.3.3"></script>
+    <script src="js/app.js?v=2.3.3"></script>
 
     <!-- 印刷用エリア (通常は非表示) -->
     <div id="print-area" class="print-only">

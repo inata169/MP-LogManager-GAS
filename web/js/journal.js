@@ -10,6 +10,28 @@ let easyMDE = null;
 let saveDraftTimeout = null;
 let isJournalListOpen = false;
 
+/**
+ * iOSのネイティブな「すべてを選択」がJournal全文を対象にできるようにする。
+ * EasyMDEはモバイルでcontenteditableを使い、CodeMirrorは通常、表示範囲の
+ * 前後だけをDOMへ描画するため、iOSのDOM選択が途中で切れてしまう。
+ */
+function configureIOSNativeSelection(codeMirror, navigatorObject = navigator) {
+    if (!codeMirror || !navigatorObject) return false;
+
+    const userAgent = navigatorObject.userAgent || '';
+    const platform = navigatorObject.platform || '';
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent)
+        || (platform === 'MacIntel' && navigatorObject.maxTouchPoints > 1);
+
+    if (!isIOS || codeMirror.getOption('inputStyle') !== 'contenteditable') {
+        return false;
+    }
+
+    codeMirror.setOption('viewportMargin', Infinity);
+    codeMirror.refresh();
+    return true;
+}
+
 function updateJournalLayoutState() {
     const view = document.getElementById('journal-view');
     const toggle = document.getElementById('journal-list-toggle');
@@ -385,6 +407,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 codeSyntaxHighlighting: true // highlight.js を有効化
             }
         });
+
+        configureIOSNativeSelection(easyMDE.codemirror);
 
         // 変更を監視してオートセーブ (5秒ごと)
         let autoSaveTimer = null;

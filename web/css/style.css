@@ -35,6 +35,18 @@
     box-sizing: border-box;
 }
 
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
     background: var(--bg-primary);
@@ -934,7 +946,13 @@ body {
     font-weight: 600;
 }
 
-.modal-close {
+.modal-header .modal-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
     background: none;
     border: none;
     font-size: 2rem;
@@ -972,8 +990,125 @@ body {
     font-family: inherit;
 }
 
+/* Tasksの長文を、編集時にも十分な大きさで扱えるようにする */
+#task-modal .modal-content {
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#task-modal .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+#task-modal .modal-header,
+#task-modal .modal-footer {
+    flex-shrink: 0;
+}
+
+#task-modal .modal-footer {
+    justify-content: stretch;
+}
+
+#task-modal .modal-footer .btn {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
 #task-details {
-    min-height: 140px;
+    min-height: 220px;
+    line-height: 1.55;
+    margin-bottom: 0;
+}
+
+.task-details-editor {
+    margin-bottom: 12px;
+}
+
+.task-details-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.task-details-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex: 1 1 260px;
+    max-width: 320px;
+    padding: 3px;
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    background: var(--bg-tertiary);
+}
+
+.task-details-tab {
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.task-details-tab[aria-selected="true"] {
+    background: #2f6fb3;
+    color: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.task-details-tab:focus-visible {
+    outline: 3px solid rgba(74, 144, 226, 0.35);
+    outline-offset: 2px;
+}
+
+.task-details-help {
+    flex: 0 0 auto;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
+.task-details-panel[hidden] {
+    display: none;
+}
+
+.task-details-preview {
+    width: 100%;
+    min-height: 220px;
+    height: 220px;
+    padding: 12px;
+    overflow: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    -webkit-overflow-scrolling: touch;
+}
+
+.task-details-preview > :first-child {
+    margin-top: 0;
+}
+
+.task-details-preview > :last-child {
+    margin-bottom: 0;
+}
+
+.task-details-preview-empty {
+    color: var(--text-secondary);
+    font-style: italic;
 }
 
 .help-text {
@@ -1401,14 +1536,61 @@ body {
         padding: 12px 14px;
     }
 
-    #task-details {
+    #task-modal {
+        align-items: stretch;
+        padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+    }
+
+    #task-modal .modal-content {
+        height: 100%;
+        max-height: none;
+        border-radius: 12px;
+    }
+
+    #task-modal .modal-header {
+        padding: 12px 14px;
+    }
+
+    #task-modal .modal-header h3 {
+        font-size: 1.2rem;
+    }
+
+    #task-modal .modal-body {
+        padding: 12px 14px;
+    }
+
+    #task-modal .modal-footer {
+        padding: 10px 14px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        background: var(--bg-primary);
+    }
+
+    #task-details,
+    #task-details-preview-panel {
         height: 42dvh;
         min-height: 260px;
         max-height: 52dvh;
     }
 
-    #task-modal .modal-content {
-        height: calc(100dvh - 24px);
+    #task-details {
+        resize: none;
+    }
+
+    .task-details-toolbar {
+        gap: 7px;
+    }
+
+    .task-details-tabs {
+        max-width: none;
+    }
+
+    .task-details-tab {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .task-details-help {
+        display: none;
     }
 
     .view-header {
