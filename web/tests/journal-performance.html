@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP-LogManager Journal Performance Fixture</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 1rem; line-height: 1.5; }
+        button { min-height: 44px; margin: 0 0.5rem 0.5rem 0; padding: 0.5rem 0.8rem; }
+        .CodeMirror { height: 55dvh; min-height: 320px; max-height: 560px; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+    </style>
+</head>
+<body>
+    <h1>Journal長文テスト</h1>
+    <p>基準端末: iPhone SE（第3世代、2022年）、iOS 26.6.1。端末専用コードは使用していません。</p>
+    <button type="button" data-lines="1000">1,000行を生成</button>
+    <button type="button" data-lines="5000">5,000行を生成</button>
+    <button type="button" id="verify-selection">選択範囲を検証</button>
+    <textarea id="fixture-editor"></textarea>
+    <pre id="metrics" aria-live="polite">fixtureを選択してください。</pre>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js?v=20260227"></script>
+    <script src="../vendor/dompurify/purify.min.js"
+        integrity="sha384-46dPGH1XlTmj7bc50bqLjTdORXs/3EP2QpA/6EWbelYWOY9VGp+87RT61S3Mcslb"></script>
+    <script src="../js/safe-render.js?v=2.3.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script>
+        const metrics = document.getElementById('metrics');
+        const started = performance.now();
+        const editor = new EasyMDE({
+            element: document.getElementById('fixture-editor'),
+            spellChecker: false,
+            status: false,
+            minHeight: '55dvh',
+            previewRender: text => SafeRender.markdownToSafeHtml(text).html
+        });
+        const codeMirror = editor.codemirror;
+        const navigatorObject = navigator;
+        const isIOS = /iPad|iPhone|iPod/.test(navigatorObject.userAgent || '')
+            || (navigatorObject.platform === 'MacIntel' && navigatorObject.maxTouchPoints > 1);
+        if (isIOS && codeMirror.getOption('inputStyle') === 'contenteditable') {
+            codeMirror.setOption('viewportMargin', Infinity);
+            codeMirror.refresh();
+        }
+        let expected = '';
+        let lastLines = 0;
+
+        function report(extra = '') {
+            const viewport = codeMirror.getViewport();
+            metrics.textContent = [
+                `iOS判定: ${isIOS}`,
+                `inputStyle: ${codeMirror.getOption('inputStyle')}`,
+                `viewportMargin: ${String(codeMirror.getOption('viewportMargin'))}`,
+                `行数: ${codeMirror.lineCount()}`,
+                `DOM viewport: ${viewport.from}..${viewport.to}`,
+                extra
+            ].filter(Boolean).join('\n');
+        }
+
+        document.querySelectorAll('[data-lines]').forEach(button => button.addEventListener('click', () => {
+            lastLines = Number(button.dataset.lines);
+            expected = Array.from({ length: lastLines }, (_, index) => `${String(index + 1).padStart(5, '0')}: 日本語Journal fixture line`).join('\n');
+            const before = performance.now();
+            editor.value(expected);
+            codeMirror.refresh();
+            const after = performance.now();
+            const inputBefore = performance.now();
+            codeMirror.replaceRange('測', { line: Math.floor(lastLines / 2), ch: 0 });
+            codeMirror.undo();
+            const inputAfter = performance.now();
+            report(`生成・描画: ${(after - before).toFixed(1)} ms\n中央入力+Undo: ${(inputAfter - inputBefore).toFixed(1)} ms\nクラッシュ: なし`);
+        }));
+
+        document.getElementById('verify-selection').addEventListener('click', () => {
+            const selection = codeMirror.getSelection();
+            report(`選択文字一致: ${selection === expected}\n選択文字数: ${selection.length} / ${expected.length}`);
+        });
+
+        report(`初期化: ${(performance.now() - started).toFixed(1)} ms`);
+    </script>
+</body>
+</html>

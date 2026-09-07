@@ -1,0 +1,11 @@
+flowchart LR
+    External[User / Drive / GAS / Network data]
+    Markdown[Intentional Markdown]
+    Plain[Metadata / IDs / messages]
+    SafeMarkdown[Shared fail-closed Markdown renderer]
+    DOMAPI[DOM API: textContent + listeners]
+    Purify[DOMPurify 3.4.14]
+    DOM[Live and print DOM]
+
+    External --> Markdown --> SafeMarkdown --> Purify --> DOM
+    External --> Plain --> DOMAPI --> DOM

@@ -1,6 +1,6 @@
 # MP-LogManager (GAS Edition) 🚀
 
-[![Version](https://img.shields.io/badge/version-2.3.3-orange.svg)](https://github.com/inata169/MP-LogManager-GAS)
+[![Version](https://img.shields.io/badge/version-2.3.4-orange.svg)](https://github.com/inata169/MP-LogManager-GAS)
 [![Security](https://img.shields.io/badge/Data%20Privacy-High-green.svg)](https://docs.google.com/presentation/d/...)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -30,6 +30,7 @@
 - **Compact Layout**: PC/iPhone の両方で本文領域を広く使える高密度レイアウト。
 - **iPhone Selection**: 長い日報でも、長押しメニューの「すべてを選択」で本文全体を選択可能。
 - **PDF出力**: iPhone の AirPrint や PC での PDF 保存に最適化した整形機能。
+- **Safe Print**: 印刷時のMarkdownもTaskと同じ共通サニタイザーを通し、危険なHTMLを実行しません。
 
 ### ✅ Tasks (タスク管理)
 - **Flexible Management**: カテゴリ、優先度、期限によるタスク管理。
@@ -37,6 +38,7 @@
 - **Real-time Search**: 全タスクを複数キーワードで検索。
 - **Dense Task List**: PC では複数カラム、iPhone では省スペース表示で一覧性を向上。
 - **Google Sync (v2.2.5 Optimized)**: Google カレンダーおよび Google Tasks (Todo) との同期機能。**タスク保存時には自動同期されません。設定を ON にしたうえで、ヘッダーの同期ボタンから手動実行してください。** 初回利用時は GAS 側での「承認（手動実行）」が必要です。
+- **Safe Editing (v2.3.4)**: 未保存のまま閉じる操作を確認し、保存失敗時も入力を保持。モーダルはキーボード操作・フォーカス復帰・画面拡大に対応します。
 
 ---
 

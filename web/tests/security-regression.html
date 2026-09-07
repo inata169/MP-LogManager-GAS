@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP-LogManager Safe Rendering Regression</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 2rem; line-height: 1.5; }
+        .pass { color: #176b2c; }
+        .fail { color: #a40000; }
+        #test-host { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <h1>Safe Rendering Regression</h1>
+    <p id="summary">実行中...</p>
+    <ol id="results"></ol>
+    <div id="test-host" aria-hidden="true"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js?v=20260227"></script>
+    <script src="../vendor/dompurify/purify.min.js"
+        integrity="sha384-46dPGH1XlTmj7bc50bqLjTdORXs/3EP2QpA/6EWbelYWOY9VGp+87RT61S3Mcslb"></script>
+    <script src="../js/safe-render.js?v=2.3.4"></script>
+    <script>
+        (async () => {
+            const host = document.getElementById('test-host');
+            const results = document.getElementById('results');
+            const checks = [];
+
+            function assert(name, condition) {
+                checks.push({ name, passed: Boolean(condition) });
+            }
+
+            const attacks = [
+                '<script>window.__mpXss="script"<\/script>safe',
+                '<img src=x onerror="window.__mpXss=\'img\'">',
+                '[click](javascript:window.__mpXss="md-link")',
+                '<a href="java&#x73;cript:window.__mpXss=\'entity\'">click</a>',
+                '<a href="data:text/html,<script>window.__mpXss=\'data\'<\/script>">data</a>',
+                '<svg><g onload="window.__mpXss=\'svg\'"></g></svg>',
+                '<iframe srcdoc="<script>window.parent.__mpXss=\'frame\'<\/script>"></iframe>',
+                '<style>@import url(https://attacker.invalid/x)</style><p style="color:red">x</p>',
+                '<form action="javascript:alert(1)"><button>go</button></form>',
+                '<a id="renderMarkdown" name="DOMPurify" href="#ok">clobber</a>'
+            ];
+
+            window.__mpXss = '';
+            attacks.forEach((source, index) => {
+                const target = document.createElement('div');
+                host.replaceChildren(target);
+                SafeRender.renderMarkdownInto(target, source);
+                const forbidden = target.querySelector('script,svg,math,iframe,object,embed,style,form,button,img,picture,audio,video,source,track');
+                const eventAttribute = Array.from(target.querySelectorAll('*')).some(element =>
+                    Array.from(element.attributes).some(attribute => attribute.name.toLowerCase().startsWith('on'))
+                );
+                const unsafeUrl = Array.from(target.querySelectorAll('[href],[src],[xlink\\:href]')).some(element => {
+                    const value = element.getAttribute('href') || element.getAttribute('src') || element.getAttribute('xlink:href') || '';
+                    return /^(?:javascript|vbscript|data):/i.test(value.trim());
+                });
+                const clobber = target.querySelector('#renderMarkdown,[name="DOMPurify"]');
+                assert(`attack-${index + 1}`, !forbidden && !eventAttribute && !unsafeUrl && !clobber && !window.__mpXss);
+            });
+
+            const positive = document.createElement('div');
+            SafeRender.renderMarkdownInto(positive, '# H\n\n**bold** *em* ~~del~~\n\n1. one\n\n- [x] done\n\n```html\n<img src=x>\n```\n\n|A|B|\n|-|-|\n|1|2|\n\n[safe](https://example.com)');
+            const positiveSelectors = ['h1', 'strong', 'em', 'del', 'ol', 'ul', 'input', 'pre code', 'table', 'a[href="https://example.com"]'];
+            assert('positive-markdown', positiveSelectors.every(selector => positive.querySelector(selector)));
+
+            const originalPurifier = window.DOMPurify;
+            const fallback = document.createElement('div');
+            window.DOMPurify = { isSupported: false, sanitize: value => value };
+            SafeRender.renderMarkdownInto(fallback, '<img src=x onerror=alert(1)>\nliteral');
+            window.DOMPurify = originalPurifier;
+            assert('fail-closed', fallback.classList.contains('safe-render-fallback') && !fallback.querySelector('img') && fallback.textContent.includes('<img'));
+
+            await new Promise(resolve => setTimeout(resolve, 0));
+            assert('no-execution', !window.__mpXss);
+
+            checks.forEach(check => {
+                const item = document.createElement('li');
+                item.className = check.passed ? 'pass' : 'fail';
+                item.textContent = `${check.passed ? 'PASS' : 'FAIL'}: ${check.name}`;
+                results.appendChild(item);
+            });
+            const failed = checks.filter(check => !check.passed).length;
+            const summary = document.getElementById('summary');
+            summary.className = failed ? 'fail' : 'pass';
+            summary.textContent = failed ? `${failed}件失敗 / ${checks.length}件` : `PASS: ${checks.length}件`;
+            document.title = failed ? `FAIL (${failed}) Safe Rendering Regression` : 'PASS Safe Rendering Regression';
+        })();
+    </script>
+</body>
+</html>

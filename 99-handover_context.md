@@ -1,7 +1,21 @@
 # Handover Context - 2026-09-07
 
 ## Current Status
-v2.3.3 is deployed, verified on a physical iPhone, tagged, and published as a GitHub Release. It fixes iPhone Journal full-text selection and adds a larger Tasks Markdown Edit/Preview workflow. The existing v2.3.2-r5 save/load diagnostics, manual Google sync behavior, data format, and GAS contract are preserved.
+v2.3.3 remains the deployed release. The approved v2.3.4 security/accessibility implementation is complete locally but is not yet deployed, tagged, or archived. It centralizes safe Markdown rendering, removes remaining reviewed dynamic HTML/event interpolation, protects unsaved Task edits and failed saves, adds accessible modal focus behavior, and permits page zoom. Data formats, GAS contracts, and Google sync semantics are unchanged.
+
+## v2.3.4 Candidate
+- Shared `web/js/safe-render.js` owns Marked + DOMPurify 3.4.14 rendering and literal-text fail-closed behavior.
+- Task/Journal lists, Journal print, diagnostics, and toasts no longer interpret external strings as application HTML.
+- Task dirty close is shared by ×, Cancel, backdrop, and Escape. Actual save failure keeps the modal and input; accepted-but-unconfirmed GAS requests retain the existing completion policy.
+- Task and Settings dialogs have names, initial focus, Tab wrapping, Escape, body lock, background inertness, and opener focus restoration.
+- Viewport zoom prohibition is removed. No iPhone SE/device-name branch exists; CSS remains width-responsive.
+- Asset queries and Service Worker cache are v2.3.4.
+- Added `web/tests/security-regression.html` and `web/tests/journal-performance.html`.
+
+## v2.3.4 Verification / Remaining Gate
+- Passed: production JavaScript syntax; single approved dynamic `innerHTML` sink; 13/13 browser security regression; dirty close paths; failed-save retention; modal focus/body/background behavior; dark mode; 320×568, 375×667, 390×844, 430×932, landscape, iPad, and desktop layouts; non-iOS finite virtualization with 1,000/5,000 lines.
+- Pending before deployment/archive: run the fixture on physical iPhone SE (3rd generation, 2022), iOS 26.6.1 and record timings/full selection-copy; verify the deployed old-PWA→v2.3.4 update and offline relaunch.
+- Active OpenSpec: `openspec/changes/improve-web-editor-safety/`.
 
 ## v2.3.3 Changes
 - On iPhone/iPad, CodeMirror uses `viewportMargin: Infinity` only for the contenteditable Journal input so native long-press “Select All” covers the complete entry.

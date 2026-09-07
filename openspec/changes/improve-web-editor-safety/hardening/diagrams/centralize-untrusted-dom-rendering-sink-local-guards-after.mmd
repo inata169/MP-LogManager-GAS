@@ -1,0 +1,11 @@
+flowchart LR
+    External[User / Drive / GAS / Network data]
+    Task[Task renderer + local guards]
+    Journal[Journal renderer + local guards]
+    Runtime[Diagnostics/toast + local guards]
+    Policies[Separate escaping and sanitizer policies]
+    DOM[Live and print DOM]
+
+    External --> Task --> Policies --> DOM
+    External --> Journal --> Policies
+    External --> Runtime --> Policies

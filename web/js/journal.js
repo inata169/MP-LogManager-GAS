@@ -83,9 +83,9 @@ function renderJournals() {
     let entries = [];
     if (searchQuery) {
         // 検索時は全期間から抽出
-        entries = journalsData.filter(j => 
-            j.title.toLowerCase().includes(searchQuery) || 
-            j.content.toLowerCase().includes(searchQuery)
+        entries = journalsData.filter(j =>
+            String(j.title ?? '').toLowerCase().includes(searchQuery) ||
+            String(j.content ?? '').toLowerCase().includes(searchQuery)
         ).sort((a, b) => new Date(b.date) - new Date(a.date)); // 日付順
     } else {
         // 通常時は日付フィルタ
@@ -93,25 +93,18 @@ function renderJournals() {
     }
 
     if (entries.length === 0) {
-        container.innerHTML = `<p style="color: var(--text-secondary); text-align: center;">${searchQuery ? '検索結果が見つかりません' : 'この日のエントリはありません'}</p>`;
+        const emptyMessage = document.createElement('p');
+        emptyMessage.className = 'journal-empty-message';
+        emptyMessage.textContent = searchQuery ? '検索結果が見つかりません' : 'この日のエントリはありません';
+        container.replaceChildren(emptyMessage);
         if (!searchQuery) clearEditor();
         updateJournalLayoutState();
         return;
     }
 
-    container.innerHTML = entries.map(entry => `
-        <div class="journal-entry ${currentEditingEntryId === entry.id ? 'active' : ''}" 
-             data-id="${entry.id}" onclick="loadJournalEntry(${entry.id})">
-            <div class="journal-item-info">
-                <div class="journal-entry-title">
-                    ${searchQuery ? `<span class="search-date-label">${entry.date}</span> ` : ''}
-                    ${escapeHtml(entry.title)}
-                </div>
-                <div class="journal-entry-preview">${escapeHtml(entry.content.substring(0, 50))}...</div>
-            </div>
-            <button class="journal-delete-btn" onclick="deleteJournalEntry(event, ${entry.id})" title="削除">🗑️</button>
-        </div>
-    `).join('');
+    const fragment = document.createDocumentFragment();
+    entries.forEach(entry => fragment.appendChild(createJournalEntryElement(entry, Boolean(searchQuery))));
+    container.replaceChildren(fragment);
 
     // 最初のエントリを自動選択 (検索時以外または以前の選択がない場合)
     if (!currentEditingEntryId && entries.length > 0) {
@@ -119,6 +112,45 @@ function renderJournals() {
     } else {
         updateJournalLayoutState();
     }
+}
+
+function createJournalEntryElement(entry, showDate) {
+    const item = document.createElement('div');
+    item.className = `journal-entry${currentEditingEntryId === entry.id ? ' active' : ''}`;
+    item.dataset.id = String(entry.id ?? '');
+
+    const info = document.createElement('div');
+    info.className = 'journal-item-info';
+
+    const title = document.createElement('div');
+    title.className = 'journal-entry-title';
+    if (showDate) {
+        const dateLabel = document.createElement('span');
+        dateLabel.className = 'search-date-label';
+        dateLabel.textContent = String(entry.date ?? '');
+        title.append(dateLabel, document.createTextNode(' '));
+    }
+    title.appendChild(document.createTextNode(String(entry.title ?? '')));
+
+    const preview = document.createElement('div');
+    preview.className = 'journal-entry-preview';
+    preview.textContent = `${String(entry.content ?? '').substring(0, 50)}...`;
+
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'journal-delete-btn';
+    deleteButton.title = '削除';
+    deleteButton.setAttribute('aria-label', `削除: ${String(entry.title ?? '')}`);
+    deleteButton.textContent = '🗑️';
+    deleteButton.addEventListener('click', event => {
+        event.stopPropagation();
+        deleteJournalEntry(entry.id);
+    });
+
+    info.append(title, preview);
+    item.append(info, deleteButton);
+    item.addEventListener('click', () => loadJournalEntry(entry.id));
+    return item;
 }
 
 /**
@@ -130,16 +162,16 @@ function loadJournalEntry(entryId) {
 
     currentEditingEntryId = entryId;
     isJournalListOpen = false;
-    document.getElementById('journal-title').value = entry.title;
+    document.getElementById('journal-title').value = String(entry.title ?? '');
     if (easyMDE) {
-        easyMDE.value(entry.content);
+        easyMDE.value(String(entry.content ?? ''));
     } else {
-        document.getElementById('journal-content').value = entry.content;
+        document.getElementById('journal-content').value = String(entry.content ?? '');
     }
 
     // アクティブ表示更新
     document.querySelectorAll('.journal-entry').forEach(el => {
-        el.classList.toggle('active', parseInt(el.dataset.id) === entryId);
+        el.classList.toggle('active', el.dataset.id === String(entryId));
     });
     updateJournalLayoutState();
 }
@@ -311,13 +343,12 @@ function printJournal() {
     if (!printArea) return;
 
     // 印刷用エリアを一旦リセット（古い内容の残分を完全に排除）
-    printArea.innerHTML = `
-        <h1 id="print-title"></h1>
-        <div id="print-content" class="markdown-body"></div>
-    `;
-
-    const titleEl = document.getElementById('print-title');
-    const contentEl = document.getElementById('print-content');
+    const titleEl = document.createElement('h1');
+    titleEl.id = 'print-title';
+    const contentEl = document.createElement('div');
+    contentEl.id = 'print-content';
+    contentEl.className = 'markdown-body';
+    printArea.replaceChildren(titleEl, contentEl);
     
     // タイトルと内容を取得してサニタイズ
     const title = document.getElementById('journal-title').value.trim();
@@ -326,12 +357,7 @@ function printJournal() {
     
     titleEl.textContent = title || 'Untitled Journal';
     
-    // marked.js を使用して HTML を流し込む
-    if (typeof marked !== 'undefined') {
-        contentEl.innerHTML = marked.parse(content);
-    } else {
-        contentEl.textContent = content;
-    }
+    SafeRender.renderMarkdownInto(contentEl, content);
     
     // iOS Safari のレンダリング遅延対策として、少し待機してから印刷
     requestAnimationFrame(() => {
@@ -402,6 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showIcons: ['code', 'table', 'horizontal-rule', 'strikethrough'],
             status: false,
             minHeight: '250px',
+            previewRender: text => SafeRender.markdownToSafeHtml(text).html,
             renderingConfig: {
                 singleLineBreaks: true,
                 codeSyntaxHighlighting: true // highlight.js を有効化
@@ -439,9 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * Journal削除
  */
-async function deleteJournalEntry(event, entryId) {
-    if (event) event.stopPropagation();
-    
+async function deleteJournalEntry(entryId) {
     if (!confirm('このエントリを削除してもよろしいですか？')) {
         return;
     }

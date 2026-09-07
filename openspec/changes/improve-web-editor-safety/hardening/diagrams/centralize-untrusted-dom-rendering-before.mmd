@@ -1,0 +1,17 @@
+flowchart LR
+    External[User / Drive / GAS / Network data]
+    Task[Task renderer]
+    Journal[Journal renderer and print]
+    Runtime[Diagnostics and toast]
+    TaskSan[Task-only DOMPurify path]
+    HTML[Template strings / marked.parse]
+    DOM[Live and print DOM]
+
+    External --> Task
+    External --> Journal
+    External --> Runtime
+    Task --> TaskSan --> DOM
+    Task --> HTML
+    Journal --> HTML
+    Runtime --> HTML
+    HTML --> DOM

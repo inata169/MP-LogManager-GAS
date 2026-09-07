@@ -3,10 +3,22 @@
  */
 
 let isManualSyncRunning = false;
+let activeModal = null;
+let modalOpener = null;
+let inertedBackgroundElements = [];
+
+const MODAL_FOCUSABLE_SELECTOR = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled]):not([type="hidden"])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+].join(',');
 
 // アプリ初期化
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('MP-LogManager Web App v2.3.3 loading...');
+    console.log('MP-LogManager Web App v2.3.4 loading...');
     initTheme();
     initNavigation();
     initModals();
@@ -91,21 +103,21 @@ function initNavigation() {
  * モーダル初期化
  */
 function initModals() {
-    // モーダルを閉じる
     document.querySelectorAll('.modal-close').forEach(btn => {
         btn.addEventListener('click', () => {
-            hideModal(btn.closest('.modal').id);
+            requestCloseModal(btn.closest('.modal').id, 'control');
         });
     });
 
-    // モーダル外クリックで閉じる
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
-                hideModal(modal.id);
+                requestCloseModal(modal.id, 'overlay');
             }
         });
     });
+
+    document.addEventListener('keydown', handleModalKeydown);
 
     // 設定保存
     document.getElementById('save-settings').addEventListener('click', () => {
@@ -160,7 +172,10 @@ function initModals() {
         btn.textContent = 'テスト中...';
         btn.disabled = true;
         diagResult.style.display = 'block';
-        diagResult.innerHTML = '<div class="diag-loading">診断中...</div>';
+        const loadingMessage = document.createElement('div');
+        loadingMessage.className = 'diag-loading';
+        loadingMessage.textContent = '診断中...';
+        diagResult.replaceChildren(loadingMessage);
 
         const tempApi = new GasAPI();
         tempApi.setUrl(gasUrl);
@@ -168,42 +183,17 @@ function initModals() {
         try {
             const result = await tempApi.diagnose();
             
-            let html = `<h4>診断結果</h4><ul class="diag-list">`;
-            result.steps.forEach(step => {
-                const statusClass = step.status === 'OK' ? 'diag-ok' : 'diag-fail';
-                html += `
-                    <li>
-                        <span class="diag-step-name">${step.name}</span>
-                        <span class="diag-step-status ${statusClass}">${step.status}</span>
-                        ${step.error ? `<div class="diag-error">${step.error}</div>` : ''}
-                        ${step.hint ? `<div class="diag-hint">${step.hint}</div>` : ''}
-                    </li>`;
-            });
-            
-            // DataAPIの直近エラーも表示
-            if (DataAPI.lastError) {
-                html += `
-                    <li class="diag-last-error">
-                        <span class="diag-step-name">Last Operations Error</span>
-                        <div class="diag-error">
-                            [${DataAPI.lastError.timestamp}] ${DataAPI.lastError.message}
-                        </div>
-                    </li>`;
-            }
-            
-            html += `</ul>`;
-            
+            renderConnectionDiagnostics(diagResult, result, DataAPI.lastError);
             if (result.ok) {
-                html += `<div class="diag-summary info">GAS ping OK. This only confirms basic connectivity; Calendar sync is not verified.</div>`;
+                appendDiagnosticSummary(diagResult, 'info', 'GAS ping OK. This only confirms basic connectivity; Calendar sync is not verified.');
                 showToast('GAS ping OK only. Calendar sync is not verified.', 'info', 5500);
             } else {
-                html += `<div class="diag-summary error">❌ 接続に失敗しました。GASのデプロイ設定（アクセス権: 全員）やクォータ制限を確認してください。</div>`;
+                appendDiagnosticSummary(diagResult, 'error', '❌ 接続に失敗しました。GASのデプロイ設定（アクセス権: 全員）やクォータ制限を確認してください。');
                 showToast('接続失敗', 'error');
             }
-            
-            diagResult.innerHTML = html;
         } catch (e) {
-            diagResult.innerHTML = `<div class="diag-summary error">重大なエラー: ${e.message}</div>`;
+            diagResult.replaceChildren();
+            appendDiagnosticSummary(diagResult, 'error', `重大なエラー: ${String(e.message ?? e)}`);
             showToast(`エラー: ${e.message}`, 'error');
         } finally {
             btn.textContent = originalText;
@@ -212,16 +202,82 @@ function initModals() {
     });
 }
 
+function appendTextElement(parent, tagName, className, value) {
+    const element = document.createElement(tagName);
+    if (className) element.className = className;
+    element.textContent = String(value ?? '');
+    parent.appendChild(element);
+    return element;
+}
+
+function renderConnectionDiagnostics(container, result, lastError) {
+    container.replaceChildren();
+    appendTextElement(container, 'h4', '', '診断結果');
+    const list = document.createElement('ul');
+    list.className = 'diag-list';
+
+    const steps = Array.isArray(result?.steps) ? result.steps : [];
+    steps.forEach(step => {
+        const item = document.createElement('li');
+        appendTextElement(item, 'span', 'diag-step-name', step?.name);
+        const isOk = step?.status === 'OK';
+        appendTextElement(item, 'span', `diag-step-status ${isOk ? 'diag-ok' : 'diag-fail'}`, step?.status);
+        if (step?.error) appendTextElement(item, 'div', 'diag-error', step.error);
+        if (step?.hint) appendTextElement(item, 'div', 'diag-hint', step.hint);
+        list.appendChild(item);
+    });
+
+    if (lastError) {
+        const item = document.createElement('li');
+        item.className = 'diag-last-error';
+        appendTextElement(item, 'span', 'diag-step-name', 'Last Operations Error');
+        appendTextElement(item, 'div', 'diag-error', `[${String(lastError.timestamp ?? '')}] ${String(lastError.message ?? '')}`);
+        list.appendChild(item);
+    }
+    container.appendChild(list);
+}
+
+function appendDiagnosticSummary(container, type, message) {
+    const safeType = type === 'info' ? 'info' : 'error';
+    appendTextElement(container, 'div', `diag-summary ${safeType}`, message);
+}
+
 /**
  * モーダル表示
  */
 function showModal(modalId) {
     const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    if (activeModal && activeModal !== modal) {
+        hideModal(activeModal.id);
+    }
+
+    const focusedElement = document.activeElement;
+    modalOpener = focusedElement instanceof HTMLElement && !modal.contains(focusedElement)
+        ? focusedElement
+        : null;
+    activeModal = modal;
     modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    setModalBackgroundInert(modal);
 
     // 前回閉じた位置ではなく、常にフォーム先頭から表示する
     modal.querySelectorAll('.modal-content, .modal-body').forEach(element => {
         element.scrollTop = 0;
+    });
+
+    requestAnimationFrame(() => {
+        const initialFocus = modal.querySelector('[data-modal-initial-focus]')
+            || getModalFocusableElements(modal)[0]
+            || modal.querySelector('.modal-content');
+        if (initialFocus) {
+            if (!initialFocus.hasAttribute('tabindex') && initialFocus.classList.contains('modal-content')) {
+                initialFocus.tabIndex = -1;
+            }
+            initialFocus.focus({ preventScroll: true });
+        }
     });
 }
 
@@ -229,7 +285,103 @@ function showModal(modalId) {
  * モーダル非表示
  */
 function hideModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    if (activeModal !== modal) return;
+
+    activeModal = null;
+    restoreModalBackground();
+    document.body.classList.remove('modal-open');
+
+    const opener = modalOpener;
+    modalOpener = null;
+    requestAnimationFrame(() => {
+        if (opener?.isConnected && typeof opener.focus === 'function') {
+            opener.focus({ preventScroll: true });
+        }
+    });
+}
+
+function requestCloseModal(modalId, reason = 'programmatic') {
+    const modal = document.getElementById(modalId);
+    if (!modal || !modal.classList.contains('active')) return false;
+
+    const closeEvent = new CustomEvent('modalbeforeclose', {
+        cancelable: true,
+        detail: { reason }
+    });
+    if (!modal.dispatchEvent(closeEvent)) return false;
+
+    hideModal(modalId);
+    return true;
+}
+
+function getModalFocusableElements(modal) {
+    return Array.from(modal.querySelectorAll(MODAL_FOCUSABLE_SELECTOR)).filter(element => {
+        return !element.hidden
+            && element.getAttribute('aria-hidden') !== 'true'
+            && element.getClientRects().length > 0;
+    });
+}
+
+function handleModalKeydown(event) {
+    if (!activeModal) return;
+
+    if (event.key === 'Escape') {
+        event.preventDefault();
+        requestCloseModal(activeModal.id, 'escape');
+        return;
+    }
+
+    if (event.key !== 'Tab') return;
+    const focusable = getModalFocusableElements(activeModal);
+    if (focusable.length === 0) {
+        event.preventDefault();
+        activeModal.querySelector('.modal-content')?.focus({ preventScroll: true });
+        return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === first || !activeModal.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    }
+}
+
+function setModalBackgroundInert(modal) {
+    restoreModalBackground();
+    const backgroundElements = document.querySelectorAll('body > .app-header, body > #app-main, body > .bottom-nav, body > .modal');
+    inertedBackgroundElements = Array.from(backgroundElements)
+        .filter(element => element !== modal)
+        .map(element => ({
+            element,
+            wasInert: element.hasAttribute('inert'),
+            previousAriaHidden: element.getAttribute('aria-hidden')
+        }));
+    inertedBackgroundElements.forEach(({ element }) => {
+        element.setAttribute('inert', '');
+        element.setAttribute('aria-hidden', 'true');
+    });
+}
+
+function restoreModalBackground() {
+    inertedBackgroundElements.forEach(({ element, wasInert, previousAriaHidden }) => {
+        if (!element.isConnected) return;
+        if (!wasInert) element.removeAttribute('inert');
+        if (previousAriaHidden == null) {
+            element.removeAttribute('aria-hidden');
+        } else {
+            element.setAttribute('aria-hidden', previousAriaHidden);
+        }
+    });
+    inertedBackgroundElements = [];
 }
 
 /**
@@ -246,15 +398,24 @@ function showToast(message, type = 'info', duration = 3000) {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
+    const allowedTypes = new Set(['info', 'success', 'error', 'warning']);
+    const safeType = allowedTypes.has(type) ? type : 'info';
     const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
+    toast.className = `toast ${safeType}`;
+    toast.setAttribute('role', safeType === 'error' ? 'alert' : 'status');
     
     let icon = 'ℹ️';
-    if (type === 'success') icon = '✅';
-    if (type === 'error') icon = '❌';
-    if (type === 'warning') icon = '⚠️';
+    if (safeType === 'success') icon = '✅';
+    if (safeType === 'error') icon = '❌';
+    if (safeType === 'warning') icon = '⚠️';
 
-    toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+    const iconElement = document.createElement('span');
+    iconElement.setAttribute('aria-hidden', 'true');
+    iconElement.textContent = icon;
+    const messageElement = document.createElement('span');
+    messageElement.className = 'toast-message';
+    messageElement.textContent = String(message ?? '');
+    toast.append(iconElement, messageElement);
     container.appendChild(toast);
 
     // 自動消去

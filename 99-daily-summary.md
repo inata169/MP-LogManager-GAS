@@ -1,5 +1,28 @@
 # Daily Summary - 2026-09-07
 
+## v2.3.4 Security and Accessibility Candidate
+The approved `improve-web-editor-safety` implementation is complete locally. Task and Journal now share one DOMPurify-required renderer, ordinary external values are inserted as text, and persisted IDs no longer enter inline executable handlers.
+
+### Completed Work
+- Added `web/js/safe-render.js` and migrated Task preview/list plus Journal print.
+- Rebuilt Task/Journal lists, connection diagnostics, and toast messages with DOM APIs.
+- Added Task dirty-close protection and rollback-on-save-failure behavior.
+- Added accessible Task/Settings modal focus lifecycle and enabled pinch zoom.
+- Added 13-case safe-render regression and Journal 1,000/5,000-line performance fixtures.
+- Bumped local assets and the Service Worker cache to v2.3.4.
+
+### Verification
+- Production JavaScript syntax and static dynamic-HTML sink checks passed.
+- Browser safe-render suite passed 13/13 cases.
+- Dirty Cancel/Escape/close/backdrop, failed save retention, modal focus wrapping/restoration, dark mode, and responsive layouts from 320×568 through iPad and desktop passed.
+- Non-iOS fixed-height Journal fixture kept `viewportMargin: 10`; 1,000 and 5,000 lines completed without a crash.
+- Physical iPhone SE (3rd generation, 2022), iOS 26.6.1 timing/copy and deployed PWA offline-update checks remain pending.
+
+### Preserved Constraints
+- No data schema, GAS contract, or Google sync semantic changes.
+- No device-name or iPhone SE-specific implementation branch.
+- OpenSpec remains active until deployment and physical-device verification.
+
 ## v2.3.3 iPhone Journal and Tasks UX
 v2.3.3 fixes complete-text selection in long Journal entries on iPhone and adds a spacious, safe Markdown editing flow to Tasks without changing stored data formats or GAS contracts.
 

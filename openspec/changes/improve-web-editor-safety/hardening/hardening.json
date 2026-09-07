@@ -1,0 +1,305 @@
+{
+  "documentType": "codex-security.hardening-analysis",
+  "schemaVersion": "1.0",
+  "analysisId": "hardening_20260907_web_editor_safety",
+  "sourceEvidence": {
+    "kind": "source_collection",
+    "label": "MP-LogManager Web editor rendering and modal source review",
+    "collectionSha256": "f5ecc84a330e5a4a303ce61a0a87361cfd3832d111474a72435e1c34fb08254c",
+    "artifactCount": 5,
+    "targetRevision": "c510d498fff7f2fae832492ecc0556bb0ddda3cd",
+    "sourceDrift": "none"
+  },
+  "assessment": {
+    "outcome": "opportunities_identified",
+    "summary": "Repeated dynamic HTML sinks support one shared safe-rendering boundary rather than independent escaping patches."
+  },
+  "constraints": {
+    "profile": "balanced",
+    "changeHorizons": ["incremental"],
+    "nonNegotiables": [
+      "Preserve the JSON schema and top-level data structure.",
+      "Preserve the GAS API contract and Google sync semantics.",
+      "Preserve iPhone native full-document Journal selection."
+    ],
+    "assumptions": [
+      "No measured latency or memory budget was supplied.",
+      "The small Vanilla JavaScript application can accept one additional local utility module.",
+      "Vendored DOMPurify 3.4.14 remains the approved sanitizer dependency."
+    ]
+  },
+  "opportunities": [
+    {
+      "opportunityId": "centralize-untrusted-dom-rendering",
+      "title": "Centralize untrusted DOM rendering",
+      "summary": "Place every intentional Markdown-to-HTML conversion behind one sanitizer and construct other untrusted content as text nodes with programmatic event bindings.",
+      "diagnosis": "The application has a safe Task Markdown path, but equivalent controls are dispersed or absent in Journal print, record lists, diagnostics, and notifications.",
+      "evidence": [
+        {
+          "claimType": "observed",
+          "sourceKind": "source",
+          "evidenceId": "SRC-04-JOURNAL-PRINT",
+          "path": "web/js/journal.js",
+          "claim": "printJournal inserts marked.parse output directly into print-content.innerHTML without DOMPurify."
+        },
+        {
+          "claimType": "observed",
+          "sourceKind": "source",
+          "evidenceId": "SRC-03-TASK-CARDS",
+          "path": "web/js/tasks.js",
+          "claim": "renderTasks interpolates persisted identifiers, category, priority, and due date into HTML and inline event handlers."
+        },
+        {
+          "claimType": "observed",
+          "sourceKind": "source",
+          "evidenceId": "SRC-04-JOURNAL-LIST",
+          "path": "web/js/journal.js",
+          "claim": "renderJournalList interpolates persisted identifiers and dates into HTML and inline event handlers."
+        },
+        {
+          "claimType": "observed",
+          "sourceKind": "source",
+          "evidenceId": "SRC-02-RUNTIME-MESSAGES",
+          "path": "web/js/app.js",
+          "claim": "Connection diagnostics, caught error messages, and toast messages are concatenated into innerHTML."
+        },
+        {
+          "claimType": "inferred",
+          "sourceKind": "source",
+          "evidenceId": "SRC-INFERRED-CONTROL-DRIFT",
+          "path": "web/js/tasks.js",
+          "claim": "Because safe rendering is owned by one feature rather than a shared boundary, later HTML surfaces can omit or diverge from the sanitizer policy."
+        }
+      ],
+      "desiredInvariants": [
+        "Every Markdown-to-HTML conversion passes through one DOMPurify-backed fail-closed renderer.",
+        "Every other user, Drive, GAS, or network-derived string reaches the DOM through textContent or an equivalent text-node API.",
+        "Persisted identifiers never become executable inline event-handler source.",
+        "Sanitizer absence, lack of browser support, or exceptions produce inert text rather than unsanitized HTML."
+      ],
+      "proposalPath": "proposals/centralize-untrusted-dom-rendering.md",
+      "options": [
+        {
+          "optionId": "sink-local-guards",
+          "title": "Add guards at each current sink",
+          "kind": "baseline",
+          "summary": "Patch Journal print and escape or validate each current interpolation while retaining feature-owned rendering code.",
+          "diagramPaths": {
+            "before": "diagrams/centralize-untrusted-dom-rendering-before.mmd",
+            "after": "diagrams/centralize-untrusted-dom-rendering-sink-local-guards-after.mmd"
+          },
+          "evidenceCoverage": [
+            {
+              "evidenceId": "SRC-04-JOURNAL-PRINT",
+              "effect": "addresses",
+              "tacticalFixRequired": true,
+              "rationale": "A local DOMPurify call directly protects the observed print sink."
+            },
+            {
+              "evidenceId": "SRC-03-TASK-CARDS",
+              "effect": "addresses",
+              "tacticalFixRequired": true,
+              "rationale": "Local escaping and identifier validation protect the current Task card template."
+            },
+            {
+              "evidenceId": "SRC-04-JOURNAL-LIST",
+              "effect": "addresses",
+              "tacticalFixRequired": true,
+              "rationale": "Local escaping and identifier validation protect the current Journal list template."
+            },
+            {
+              "evidenceId": "SRC-02-RUNTIME-MESSAGES",
+              "effect": "addresses",
+              "tacticalFixRequired": true,
+              "rationale": "Each diagnostic and toast interpolation receives a local text treatment."
+            },
+            {
+              "evidenceId": "SRC-INFERRED-CONTROL-DRIFT",
+              "effect": "unaffected",
+              "tacticalFixRequired": true,
+              "rationale": "Control ownership remains distributed, so future sinks can still omit a guard."
+            }
+          ],
+          "tradeoffs": [
+            {
+              "dimension": "security",
+              "direction": "improves",
+              "confidence": "high",
+              "basis": "source-derived",
+              "assessment": "The known sinks can reject active content, but the application retains several independently maintained policies.",
+              "validationPlan": "Run the attack corpus against every patched sink and search all innerHTML assignments for untrusted values."
+            },
+            {
+              "dimension": "performance",
+              "direction": "neutral",
+              "confidence": "medium",
+              "basis": "source-derived",
+              "assessment": "Local string escaping and one print-time sanitizer call add bounded work on existing render paths.",
+              "validationPlan": "Compare Task/Journal list render time and Journal print preparation before and after the patch."
+            },
+            {
+              "dimension": "memory",
+              "direction": "neutral",
+              "confidence": "medium",
+              "basis": "source-derived",
+              "assessment": "The option retains existing string templates and adds only temporary escaped strings.",
+              "validationPlan": "Record heap growth while repeatedly rendering a large Task and Journal list."
+            },
+            {
+              "dimension": "reliability",
+              "direction": "improves",
+              "confidence": "medium",
+              "basis": "source-derived",
+              "assessment": "Malformed values become less likely to break the current DOM, although mismatched local policies remain possible.",
+              "validationPlan": "Render malformed identifiers, null metadata, and sanitizer failures across all current surfaces."
+            },
+            {
+              "dimension": "operability",
+              "direction": "neutral",
+              "confidence": "medium",
+              "basis": "hypothetical",
+              "assessment": "No new module appears, but reviewers must continue auditing every sink independently.",
+              "validationPlan": "Measure review effort by checking whether one search can establish all rendering invariants."
+            },
+            {
+              "dimension": "migration",
+              "direction": "improves",
+              "confidence": "high",
+              "basis": "source-derived",
+              "assessment": "Small local patches are easy to stage and revert with no data or API migration.",
+              "validationPlan": "Ship each sink patch separately and confirm the existing visual snapshots."
+            }
+          ],
+          "residualRisks": [
+            "A new feature can introduce another unsanitized sink.",
+            "Different local sanitizer configurations can drift.",
+            "Inline event source remains attractive unless every list is fully refactored."
+          ],
+          "implementationReadiness": {
+            "affectedComponents": ["web/js/tasks.js", "web/js/journal.js", "web/js/app.js"],
+            "workPackages": ["Patch each current sink and add per-sink regression cases."],
+            "acceptanceCriteria": ["The known attack corpus remains inert on every current dynamic HTML surface."],
+            "migrationNotes": ["Keep the existing Task Markdown sanitizer while other sinks are patched."],
+            "rollback": "Revert the individual sink patch while retaining v2.3.3 Task Markdown sanitization."
+          }
+        },
+        {
+          "optionId": "shared-safe-render-boundary",
+          "title": "Adopt one shared safe-rendering boundary",
+          "kind": "structural",
+          "summary": "Centralize sanitized Markdown, use DOM text construction elsewhere, and remove persisted identifiers from inline event source.",
+          "diagramPaths": {
+            "before": "diagrams/centralize-untrusted-dom-rendering-before.mmd",
+            "after": "diagrams/centralize-untrusted-dom-rendering-shared-safe-render-boundary-after.mmd"
+          },
+          "evidenceCoverage": [
+            {
+              "evidenceId": "SRC-04-JOURNAL-PRINT",
+              "effect": "addresses",
+              "tacticalFixRequired": true,
+              "rationale": "Journal print must migrate to the shared Markdown boundary."
+            },
+            {
+              "evidenceId": "SRC-03-TASK-CARDS",
+              "effect": "addresses",
+              "tacticalFixRequired": true,
+              "rationale": "DOM construction and closure-bound listeners remove metadata and identifiers from HTML source."
+            },
+            {
+              "evidenceId": "SRC-04-JOURNAL-LIST",
+              "effect": "addresses",
+              "tacticalFixRequired": true,
+              "rationale": "DOM construction and closure-bound listeners remove Journal identifiers from HTML source."
+            },
+            {
+              "evidenceId": "SRC-02-RUNTIME-MESSAGES",
+              "effect": "addresses",
+              "tacticalFixRequired": true,
+              "rationale": "Diagnostics and toasts use typed nodes with dynamic values assigned as text."
+            },
+            {
+              "evidenceId": "SRC-INFERRED-CONTROL-DRIFT",
+              "effect": "mitigates",
+              "tacticalFixRequired": false,
+              "rationale": "One Markdown policy and a text-by-default DOM convention reduce future control drift, though they do not enforce a browser-level policy."
+            }
+          ],
+          "tradeoffs": [
+            {
+              "dimension": "security",
+              "direction": "improves",
+              "confidence": "high",
+              "basis": "source-derived",
+              "assessment": "One fail-closed Markdown boundary and text-only DOM construction remove the repeated source-to-innerHTML pattern from the reviewed paths.",
+              "validationPlan": "Run one shared attack corpus across Task Markdown, Journal print, lists, diagnostics, and toasts; audit remaining innerHTML assignments."
+            },
+            {
+              "dimension": "performance",
+              "direction": "unknown",
+              "confidence": "medium",
+              "basis": "hypothetical",
+              "assessment": "DOM construction may trade one large HTML parse for multiple element operations; the small expected list size suggests modest impact, but no benchmark exists.",
+              "validationPlan": "Benchmark 0, 100, and 1,000 record renders against v2.3.3 and investigate regressions above 20 percent."
+            },
+            {
+              "dimension": "memory",
+              "direction": "unknown",
+              "confidence": "low",
+              "basis": "hypothetical",
+              "assessment": "Temporary template strings shrink while node creation and listener closures grow; the net effect depends on record count.",
+              "validationPlan": "Compare heap snapshots after repeated 1,000-record render and teardown cycles."
+            },
+            {
+              "dimension": "reliability",
+              "direction": "improves",
+              "confidence": "medium",
+              "basis": "source-derived",
+              "assessment": "Malformed persisted values can no longer reshape markup or executable attributes, and sanitizer failures have one defined fallback.",
+              "validationPlan": "Test null, unexpected-type, malformed-ID, parser-error, sanitizer-error, and unsupported-browser cases."
+            },
+            {
+              "dimension": "operability",
+              "direction": "improves",
+              "confidence": "medium",
+              "basis": "source-derived",
+              "assessment": "Reviewers can inspect one sanitizer policy and a smaller set of intentional HTML sinks; no service or deployment component is added.",
+              "validationPlan": "Document the allowed sinks and confirm a repository search maps each one to constant or sanitized content."
+            },
+            {
+              "dimension": "migration",
+              "direction": "regresses",
+              "confidence": "high",
+              "basis": "source-derived",
+              "assessment": "Task and Journal list construction changes more substantially and requires careful visual and event regression coverage.",
+              "validationPlan": "Migrate one surface at a time, preserve visual snapshots, and retain the v2.3.3 sanitizer until Task parity passes."
+            }
+          ],
+          "residualRisks": [
+            "A future developer can still bypass the convention because CSP and Trusted Types are not in scope.",
+            "Sanitizer defects remain part of the trusted computing base.",
+            "Third-party Markdown and editor CDN versions remain a separate supply-chain concern."
+          ],
+          "implementationReadiness": {
+            "affectedComponents": ["web/index.html", "web/js/safe-render.js", "web/js/tasks.js", "web/js/journal.js", "web/js/app.js", "web/sw.js"],
+            "workPackages": [
+              "Introduce the fail-closed Markdown boundary.",
+              "Migrate Task and Journal Markdown callers.",
+              "Replace dynamic card, diagnostic, and toast templates with typed DOM construction.",
+              "Run security, visual, event, performance, and offline regression coverage."
+            ],
+            "acceptanceCriteria": [
+              "Every reviewed untrusted value is inserted as text or shared-sanitizer output.",
+              "No persisted identifier is interpolated into inline executable code.",
+              "The full attack corpus remains inert and positive Markdown remains readable."
+            ],
+            "migrationNotes": ["Retain tactical v2.3.3 Task sanitization until the shared boundary passes parity tests."],
+            "rollback": "Revert the staged surface migration and cache version; no stored data conversion is required."
+          }
+        }
+      ],
+      "recommendedOptionId": "shared-safe-render-boundary",
+      "recommendation": "Under the balanced, small-application constraints, use the shared boundary because its reviewability and recurrence reduction justify the moderate list-render refactor."
+    }
+  ],
+  "openQuestions": []
+}

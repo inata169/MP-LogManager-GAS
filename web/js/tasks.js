@@ -7,15 +7,10 @@ let tasksSha = '';
 let currentEditingTaskId = null;
 let taskDetailsMode = 'edit';
 let taskPreviewTimer = null;
+let taskEditorSnapshot = '';
 
 const TASK_PREVIEW_DEBOUNCE_MS = 150;
-const TASK_MARKDOWN_SANITIZE_CONFIG = {
-    USE_PROFILES: { html: true },
-    FORBID_TAGS: ['script', 'style', 'form', 'button', 'textarea', 'select', 'option', 'iframe', 'object', 'embed', 'link', 'meta'],
-    FORBID_ATTR: ['style'],
-    ALLOW_DATA_ATTR: false,
-    SANITIZE_NAMED_PROPS: true
-};
+const TASK_PRIORITY_CLASSES = new Set(['high', 'medium', 'low']);
 
 /**
  * Tasks読み込み
@@ -51,7 +46,7 @@ function renderTasks() {
     const categoryFilter = document.getElementById('filter-category').value;
 
     // フィルタリング
-    let filtered = tasksData;
+    let filtered = [...tasksData];
     if (hideCompleted) {
         filtered = filtered.filter(t => t.status !== 'DONE');
     }
@@ -61,9 +56,9 @@ function renderTasks() {
 
     const searchText = document.getElementById('task-search').value.toLowerCase().trim();
     if (searchText) {
-        filtered = filtered.filter(t => 
-            t.title.toLowerCase().includes(searchText) || 
-            (t.details && t.details.toLowerCase().includes(searchText))
+        filtered = filtered.filter(t =>
+            String(t.title ?? '').toLowerCase().includes(searchText) ||
+            String(t.details ?? '').toLowerCase().includes(searchText)
         );
     }
 
@@ -88,33 +83,79 @@ function renderTasks() {
         }
     });
 
-    container.innerHTML = filtered.map(task => `
-        <div class="task-item ${task.status === 'DONE' ? 'task-done' : ''}" data-id="${task.id}">
-            <div class="task-header">
-                <input type="checkbox" class="task-checkbox" ${task.status === 'DONE' ? 'checked' : ''} 
-                       onchange="toggleTaskStatus(${task.id})">
-                <div class="task-content">
-                    <div class="task-title">${escapeHtml(task.title)}</div>
-                    <div class="task-meta">
-                        <span class="task-badge badge-category">${task.category}</span>
-                        <span class="task-badge badge-priority-${task.priority.toLowerCase()}">${task.priority}</span>
-                        ${task.due_date ? `<span>📅 ${task.due_date}</span>` : ''}
-                    </div>
-                    ${task.details ? `<div class="task-details markdown-body">${renderMarkdown(task.details)}</div>` : ''}
-                </div>
-                <button class="task-delete-btn" onclick="event.stopPropagation(); deleteTask(${task.id})" aria-label="Delete task">🗑️</button>
-            </div>
-        </div>
-    `).join('');
+    const fragment = document.createDocumentFragment();
+    filtered.forEach(task => fragment.appendChild(createTaskElement(task)));
+    container.replaceChildren(fragment);
+}
 
-    // クリックイベント（編集）
-    container.querySelectorAll('.task-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-            if (e.target.classList.contains('task-checkbox')) return;
-            const taskId = parseInt(item.dataset.id);
-            openEditTaskModal(taskId);
-        });
+function createTaskElement(task) {
+    const isDone = task.status === 'DONE';
+    const item = document.createElement('div');
+    item.className = `task-item${isDone ? ' task-done' : ''}`;
+    item.dataset.id = String(task.id ?? '');
+
+    const header = document.createElement('div');
+    header.className = 'task-header';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'task-checkbox';
+    checkbox.checked = isDone;
+    checkbox.setAttribute('aria-label', `完了状態を切り替える: ${String(task.title ?? '')}`);
+    checkbox.addEventListener('click', event => event.stopPropagation());
+    checkbox.addEventListener('change', () => toggleTaskStatus(task.id));
+
+    const content = document.createElement('div');
+    content.className = 'task-content';
+
+    const title = document.createElement('div');
+    title.className = 'task-title';
+    title.textContent = String(task.title ?? '');
+    content.appendChild(title);
+
+    const meta = document.createElement('div');
+    meta.className = 'task-meta';
+
+    const category = document.createElement('span');
+    category.className = 'task-badge badge-category';
+    category.textContent = String(task.category ?? '');
+    meta.appendChild(category);
+
+    const priorityText = String(task.priority ?? 'Medium');
+    const priorityKey = priorityText.toLowerCase();
+    const priority = document.createElement('span');
+    priority.className = `task-badge badge-priority-${TASK_PRIORITY_CLASSES.has(priorityKey) ? priorityKey : 'medium'}`;
+    priority.textContent = priorityText;
+    meta.appendChild(priority);
+
+    if (task.due_date) {
+        const dueDate = document.createElement('span');
+        dueDate.textContent = `📅 ${String(task.due_date)}`;
+        meta.appendChild(dueDate);
+    }
+    content.appendChild(meta);
+
+    if (task.details) {
+        const details = document.createElement('div');
+        details.className = 'task-details markdown-body';
+        SafeRender.renderMarkdownInto(details, task.details, { preprocess: preprocessMarkdownTables });
+        content.appendChild(details);
+    }
+
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'task-delete-btn';
+    deleteButton.setAttribute('aria-label', `削除: ${String(task.title ?? '')}`);
+    deleteButton.textContent = '🗑️';
+    deleteButton.addEventListener('click', event => {
+        event.stopPropagation();
+        deleteTask(task.id);
     });
+
+    header.append(checkbox, content, deleteButton);
+    item.appendChild(header);
+    item.addEventListener('click', () => openEditTaskModal(task.id));
+    return item;
 }
 
 /**
@@ -156,13 +197,10 @@ function renderTaskDetailsPreview() {
         return;
     }
 
-    const rendered = renderMarkdown(source);
-    if (!rendered.trim()) {
+    const result = SafeRender.renderMarkdownInto(preview, source, { preprocess: preprocessMarkdownTables });
+    if (!result.hasContent || (!preview.textContent.trim() && !preview.querySelector('*'))) {
         showTaskPreviewMessage('安全に表示できる内容がありません');
-        return;
     }
-
-    preview.innerHTML = rendered;
 }
 
 function scheduleTaskDetailsPreview() {
@@ -211,6 +249,25 @@ function resetTaskDetailsEditor(source = '') {
     setTaskDetailsMode('edit');
 }
 
+function getTaskEditorSnapshot() {
+    return JSON.stringify({
+        title: document.getElementById('task-title').value,
+        category: document.getElementById('task-category').value,
+        priority: document.getElementById('task-priority').value,
+        dueDate: document.getElementById('task-due-date').value,
+        details: document.getElementById('task-details').value,
+        syncCalendar: document.getElementById('task-sync-calendar').checked
+    });
+}
+
+function captureTaskEditorSnapshot() {
+    taskEditorSnapshot = getTaskEditorSnapshot();
+}
+
+function isTaskEditorDirty() {
+    return Boolean(taskEditorSnapshot) && getTaskEditorSnapshot() !== taskEditorSnapshot;
+}
+
 function handleTaskDetailsTabKeydown(event) {
     const tabs = Array.from(document.querySelectorAll('.task-details-tab'));
     const currentIndex = tabs.indexOf(document.activeElement);
@@ -244,6 +301,7 @@ function openAddTaskModal() {
     document.getElementById('task-due-date').value = '';
     resetTaskDetailsEditor();
     document.getElementById('task-sync-calendar').checked = true; // デフォルトはON
+    captureTaskEditorSnapshot();
     showModal('task-modal');
 }
 
@@ -262,6 +320,7 @@ function openEditTaskModal(taskId) {
     document.getElementById('task-due-date').value = task.due_date || '';
     resetTaskDetailsEditor(task.details);
     document.getElementById('task-sync-calendar').checked = task.sync_calendar !== false; // 明示的に false でなければ ON
+    captureTaskEditorSnapshot();
     showModal('task-modal');
 }
 
@@ -285,23 +344,36 @@ async function saveTask() {
         sync_calendar: document.getElementById('task-sync-calendar').checked
     };
 
-    if (currentEditingTaskId) {
-        // 更新
-        const task = tasksData.find(t => t.id === currentEditingTaskId);
-        Object.assign(task, taskData);
+    const previousTasks = tasksData;
+    if (currentEditingTaskId != null) {
+        const taskIndex = tasksData.findIndex(t => t.id === currentEditingTaskId);
+        if (taskIndex < 0) {
+            showToast('編集対象のタスクが見つかりません', 'error');
+            return;
+        }
+        tasksData = tasksData.map((task, index) => index === taskIndex ? { ...task, ...taskData } : task);
     } else {
-        // 新規追加
-        const newId = Math.max(...tasksData.map(t => t.id), 0) + 1;
-        tasksData.push({
+        const numericIds = tasksData.map(task => Number(task.id)).filter(Number.isFinite);
+        const newId = Math.max(...numericIds, 0) + 1;
+        tasksData = [...tasksData, {
             id: newId,
             ...taskData,
             status: 'TODO',
             created_at: new Date().toISOString(),
             completed_at: null
-        });
+        }];
     }
 
-    await saveTasks();
+    const saveButton = document.getElementById('save-task');
+    saveButton.disabled = true;
+    const didSave = await saveTasks();
+    saveButton.disabled = false;
+    if (!didSave) {
+        tasksData = previousTasks;
+        return;
+    }
+
+    captureTaskEditorSnapshot();
     clearTaskPreviewTimer();
     hideModal('task-modal');
 }
@@ -367,21 +439,14 @@ async function saveTasks() {
         */
 
         renderTasks();
+        return true;
     } catch (error) {
         console.error('Failed to save tasks:', error);
         showToast('タスクの保存に失敗しました', 'error');
+        return false;
     } finally {
         showLoading(false);
     }
-}
-
-/**
- * HTMLエスケープ
- */
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 /**
@@ -461,35 +526,6 @@ function preprocessMarkdownTables(text) {
     return outLines.join('\n');
 }
 
-/**
- * Markdownレンダリング
- */
-function renderMarkdown(text) {
-    if (!text) return '';
-    try {
-        // テーブル内の不自然な改行を結合する前処理
-        let prepText = preprocessMarkdownTables(text);
-
-        // markedオブジェクトを確実に取得
-        const markedObj = (typeof window !== 'undefined' && window.marked) ? window.marked : (typeof marked !== 'undefined' ? marked : null);
-
-        const purifier = (typeof window !== 'undefined' && window.DOMPurify)
-            ? window.DOMPurify
-            : (typeof DOMPurify !== 'undefined' ? DOMPurify : null);
-
-        if (markedObj && typeof markedObj.parse === 'function'
-            && purifier && purifier.isSupported === true
-            && typeof purifier.sanitize === 'function') {
-            const renderedHtml = markedObj.parse(prepText, { breaks: true });
-            return purifier.sanitize(renderedHtml, TASK_MARKDOWN_SANITIZE_CONFIG);
-        }
-
-        console.error('Safe Markdown renderer is unavailable. Falling back to plain text.');
-    } catch (e) {
-        console.error("Markdown parse error:", e);
-    }
-    return escapeHtml(text).replace(/\r?\n/g, '<br>');
-}
 
 // イベントリスナー
 document.addEventListener('DOMContentLoaded', () => {
@@ -506,6 +542,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     document.querySelector('.task-details-tabs').addEventListener('keydown', handleTaskDetailsTabKeydown);
+
+    document.getElementById('task-modal').addEventListener('modalbeforeclose', event => {
+        if (!isTaskEditorDirty()) {
+            clearTaskPreviewTimer();
+            return;
+        }
+
+        if (!window.confirm('未保存の変更があります。破棄して閉じますか？')) {
+            event.preventDefault();
+            return;
+        }
+        clearTaskPreviewTimer();
+    });
 
     // ソートUIの初期化
     const sortSelect = document.getElementById('sort-tasks');

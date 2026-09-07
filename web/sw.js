@@ -2,15 +2,16 @@
  * Service Worker - PWAオフライン対応
  */
 
-const CACHE_NAME = 'mp-logmanager-gas-v2-3-3';
+const CACHE_NAME = 'mp-logmanager-gas-v2-3-4';
 const urlsToCache = [
     './',
     'index.html',
-    'css/style.css?v=2.3.3',
-    'js/app.js?v=2.3.3',
-    'js/api.js?v=2.3.3',
-    'js/tasks.js?v=2.3.3',
-    'js/journal.js?v=2.3.3',
+    'css/style.css?v=2.3.4',
+    'js/app.js?v=2.3.4',
+    'js/api.js?v=2.3.4',
+    'js/safe-render.js?v=2.3.4',
+    'js/tasks.js?v=2.3.4',
+    'js/journal.js?v=2.3.4',
     'vendor/dompurify/purify.min.js',
     'manifest.json'
 ];

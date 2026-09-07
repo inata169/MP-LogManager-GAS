@@ -59,6 +59,15 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
 }
 
+body.modal-open {
+    overflow: hidden;
+}
+
+:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
 /* ===== Header ===== */
 .app-header {
     position: fixed;
@@ -597,6 +606,11 @@ body {
     margin-bottom: 20px;
 }
 
+.journal-empty-message {
+    color: var(--text-secondary);
+    text-align: center;
+}
+
 .journal-entry {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
@@ -933,6 +947,10 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
+.modal-content:focus {
+    outline: none;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -1109,6 +1127,11 @@ body {
 .task-details-preview-empty {
     color: var(--text-secondary);
     font-style: italic;
+}
+
+.safe-render-fallback {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 .help-text {
@@ -1317,6 +1340,11 @@ body {
 .toast.success { border-left-color: var(--success-color); }
 .toast.error { border-left-color: var(--danger-color); }
 .toast.warning { border-left-color: var(--warning-color); }
+
+.toast-message {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
 
 .toast.fade-out {
     animation: toast-out 0.3s ease-in forwards;
