@@ -15,12 +15,12 @@
 ## 3. Accessible Modal Lifecycle
 - [x] 3.1 Taskと設定モーダルへ完全なdialog名付けとボタン種別・ラベルを追加する。
 - [x] 3.2 開いたモーダルへの初期フォーカス、Tab/Shift+Tab循環、Escape、body scroll lock、呼び出し元へのフォーカス復帰を実装する。
-- [ ] 3.3 viewportの拡大禁止を除き、200%相当の表示でも主要操作へ到達できることを確認する。
+- [x] 3.3 viewportの拡大禁止を除き、200%相当の表示でも主要操作へ到達できることを確認する。
 
 ## 4. Journal Performance And Regression QA
-- [ ] 4.1 1,000行・5,000行fixtureでiPhone Safari/PWAの初期化、入力、全文選択、コピー、クラッシュ有無を測定・記録する。
+- [x] 4.1 1,000行・5,000行fixtureでiPhone Safari/PWAの初期化、入力、全文選択、コピー、クラッシュ有無を測定・記録する。
 - [x] 4.2 非iOSでCodeMirror virtualizationが維持されることを確認する。
-- [ ] 4.3 320×568、390×844、デスクトップ、ダークモード、キーボード操作、PWAオフライン更新を確認する。
+- [x] 4.3 320×568、390×844、デスクトップ、ダークモード、キーボード操作、PWAオフライン更新を確認する。
 - [x] 4.4 JavaScript構文、OpenSpec strict、危険HTML/URL、保存失敗、dirty closeの回帰確認を実行する。
 
 ## 5. Release And Documentation

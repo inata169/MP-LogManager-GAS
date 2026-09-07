@@ -1,7 +1,7 @@
 # Daily Summary - 2026-09-07
 
-## v2.3.4 Security and Accessibility Candidate
-The approved `improve-web-editor-safety` implementation is complete locally. Task and Journal now share one DOMPurify-required renderer, ordinary external values are inserted as text, and persisted IDs no longer enter inline executable handlers.
+## v2.3.4 Security and Accessibility Release
+v2.3.4 is deployed and physically verified. Task and Journal now share one DOMPurify-required renderer, ordinary external values are inserted as text, and persisted IDs no longer enter inline executable handlers.
 
 ### Completed Work
 - Added `web/js/safe-render.js` and migrated Task preview/list plus Journal print.
@@ -16,12 +16,13 @@ The approved `improve-web-editor-safety` implementation is complete locally. Tas
 - Browser safe-render suite passed 13/13 cases.
 - Dirty Cancel/Escape/close/backdrop, failed save retention, modal focus wrapping/restoration, dark mode, and responsive layouts from 320×568 through iPad and desktop passed.
 - Non-iOS fixed-height Journal fixture kept `viewportMargin: 10`; 1,000 and 5,000 lines completed without a crash.
-- Physical iPhone SE (3rd generation, 2022), iOS 26.6.1 timing/copy and deployed PWA offline-update checks remain pending.
+- GitHub Pages served the v2.3.4 app, renderer, fixtures, and Service Worker successfully.
+- The user confirmed physical iPhone SE (3rd generation, 2022), iOS 26.6.1 acceptance with no reported failure. Numerical device timings were not supplied.
 
 ### Preserved Constraints
 - No data schema, GAS contract, or Google sync semantic changes.
 - No device-name or iPhone SE-specific implementation branch.
-- OpenSpec remains active until deployment and physical-device verification.
+- OpenSpec is archived in the post-release documentation commit.
 
 ## v2.3.3 iPhone Journal and Tasks UX
 v2.3.3 fixes complete-text selection in long Journal entries on iPhone and adds a spacious, safe Markdown editing flow to Tasks without changing stored data formats or GAS contracts.

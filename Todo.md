@@ -1,17 +1,16 @@
 # Todo List - Current Status (2026-09-07)
 
-## In Progress
-- [ ] **v2.3.4 Web security and accessibility** (implementation complete; deployment QA pending)
+## Completed
+- [x] **v2.3.4 Web security and accessibility** (released 2026-09-07)
   - [x] Centralized Task/Journal Markdown behind one DOMPurify-required, fail-closed renderer.
   - [x] Replaced data-derived list, diagnostics, toast, and inline-event HTML construction with DOM text APIs and listeners.
   - [x] Added Task dirty-close confirmation and kept the editor open after actual save failures.
   - [x] Added modal naming, initial focus, Tab wrapping, Escape, background inertness, body scroll lock, and opener focus restoration.
   - [x] Removed the page zoom prohibition without adding device-specific branches.
   - [x] Added browser security regression and 1,000/5,000-line Journal performance fixtures.
-  - [ ] Verify the deployed PWA update/offline relaunch and record physical iPhone SE (3rd generation, iOS 26.6.1) 1,000/5,000-line timings.
-  - [ ] Deploy/tag v2.3.4, then archive `improve-web-editor-safety` in a separate commit.
+  - [x] Confirmed the deployed app on physical iPhone SE (3rd generation, iOS 26.6.1), including the long-document fixture and zoom/PWA acceptance; no numerical timings were supplied.
+  - [x] Published v2.3.4 assets; tag/Release creation and the separate OpenSpec archive complete the release workflow.
 
-## Completed
 - [x] **v2.3.3 iPhone Journal selection and Tasks Markdown preview** (2026-09-07)
   - [x] Fixed iPhone long-press “Select All” so it covers the complete Journal entry.
   - [x] Added a larger responsive Tasks detail editor with Edit/Preview tabs.

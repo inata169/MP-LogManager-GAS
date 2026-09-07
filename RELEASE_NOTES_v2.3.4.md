@@ -1,6 +1,6 @@
 # Release Notes v2.3.4
 
-**Status:** Release candidate; deployment and physical-device performance recording remain pending.
+**Status:** Released 2026-09-07.
 
 ## Summary
 v2.3.4 gives Task and Journal one shared safe Markdown boundary and improves Task/modal accessibility without changing stored data or Google synchronization. The responsive code is shared across phones, tablets, and desktops; iPhone SE is a physical QA reference, not a dedicated target.
@@ -32,4 +32,5 @@ v2.3.4 gives Task and Journal one shared safe Markdown boundary and improves Tas
 - Initial focus, forward/backward Tab wrapping, body lock, background inertness, and opener focus restoration passed.
 - Browser checks passed at 320×568, 375×667, 390×844, 430×932, 667×375 landscape, 768×1024, and 1280×800; no horizontal overflow and footer actions remained reachable.
 - Non-iOS 1,000/5,000-line fixture retained `viewportMargin: 10` virtualization and completed without a crash.
-- Physical iPhone SE (3rd generation, 2022), iOS 26.6.1 long-document timing/copy and deployed PWA offline-update checks remain release-gate items.
+- GitHub Pages served the v2.3.4 app, shared renderer, test fixtures, and Service Worker successfully.
+- Physical iPhone SE (3rd generation, 2022), iOS 26.6.1 acceptance was confirmed by the user after deployment. The 1,000/5,000-line fixture, selection/copy flow, zoom reachability, and PWA use completed without a reported failure; numerical device timings were not supplied.
