@@ -1,7 +1,31 @@
-# Handover Context - 2026-06-13
+# Handover Context - 2026-09-07
 
 ## Current Status
-v2.3.2 is complete and released. `main` includes the v2.3.2-r5 follow-up patch for Calendar diagnostic toast styling. The `v2.3.2` and `v2.3.2-r5` tags have been pushed. The `v2.3.2` and `v2.3.2-r5` GitHub Releases were created manually on GitHub.
+v2.3.3 is prepared for deployment from `main`. It fixes iPhone Journal full-text selection and adds a larger Tasks Markdown Edit/Preview workflow. The existing v2.3.2-r5 save/load diagnostics, manual Google sync behavior, data format, and GAS contract are preserved.
+
+## v2.3.3 Changes
+- On iPhone/iPad, CodeMirror uses `viewportMargin: Infinity` only for the contenteditable Journal input so native long-press “Select All” covers the complete entry.
+- Tasks add/edit uses accessible Edit/Preview tabs, a larger responsive details area, and reachable footer actions on small screens.
+- Task Markdown source is preserved exactly for nonblank content; rendered HTML is never stored.
+- The shared Tasks Markdown renderer sanitizes both list and preview HTML with vendored DOMPurify 3.4.14 and fails closed to escaped text when unsupported or unavailable.
+- DOMPurify is loaded with SRI and included in the Service Worker precache.
+- Asset query strings are `v2.3.3`; the Service Worker cache is `mp-logmanager-gas-v2-3-3`.
+- The active OpenSpec change is `openspec/changes/add-task-markdown-preview/`, targeting the live `mobile-task-ux` capability. Archive it only after deployed behavior is verified.
+
+## v2.3.3 Verification
+- `node --check web/js/api.js`
+- `node --check web/js/app.js`
+- `node --check web/js/tasks.js`
+- `node --check web/js/journal.js`
+- `node --check web/sw.js`
+- `openspec validate add-task-markdown-preview --strict --no-interactive`
+- `openspec validate --specs --strict --no-interactive`
+- Responsive browser, dark-mode, Markdown/XSS, exact-source, iOS selection-option, and offline Service Worker checks.
+
+## v2.3.3 Known Follow-ups
+- Perform final native long-press/copy verification on a physical iPhone Safari and installed PWA with a very long Journal entry.
+- After deployment verification, archive `add-task-markdown-preview` separately and re-run strict live-spec validation.
+- A future accessibility pass can add a complete modal focus trap and revisit the existing page zoom restriction.
 
 ## v2.3.2-r5 Follow-up
 - Calendar manual sync diagnostics now use informational styling when GAS returns a readable result but Calendar visibility is not verified.
@@ -77,7 +101,7 @@ The following OpenSpec archive work happened after the `v2.3.2-r5` tag and GitHu
 - Removed merged cleanup branches `codex-fix-openspec-review-docs` and `codex-archive-add-google-sync` locally and from `origin`.
 
 ## Suggested Next Work
-- Plan larger v2.3.3+ work separately:
+- Plan larger v2.3.4+ work separately:
   - stable Calendar matching
   - event ID persistence
   - dedup/upsert improvements

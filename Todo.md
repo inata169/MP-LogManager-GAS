@@ -1,6 +1,14 @@
-# Todo List - Current Status (2026-06-13)
+# Todo List - Current Status (2026-09-07)
 
 ## Completed
+- [x] **v2.3.3 iPhone Journal selection and Tasks Markdown preview** (2026-09-07)
+  - [x] Fixed iPhone long-press “Select All” so it covers the complete Journal entry.
+  - [x] Added a larger responsive Tasks detail editor with Edit/Preview tabs.
+  - [x] Preserved the original Markdown source when previewing and saving.
+  - [x] Added DOMPurify 3.4.14 and fail-closed sanitization for Tasks Markdown rendering.
+  - [x] Updated versioned web assets and the Service Worker cache to v2.3.3.
+  - [x] Added and strictly validated the `add-task-markdown-preview` OpenSpec change.
+
 - [x] **Developer setup documentation** (2026-06-13)
   - [x] Added `docs/DEV_SETUP.md` for per-PC setup.
   - [x] Documented Git, Node.js LTS, GitHub CLI, and OpenSpec CLI checks.
@@ -76,7 +84,7 @@
   - [x] Moved persistence from GitHub data files to Google Drive through GAS.
 
 ## High Priority (Next)
-- [ ] **v2.3.3+ planning**
+- [ ] **v2.3.4+ planning**
   - [ ] Stable Calendar event matching.
   - [ ] Calendar event ID persistence.
   - [ ] Upsert/deduplication improvements.
