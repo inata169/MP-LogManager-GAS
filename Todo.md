@@ -9,7 +9,7 @@
   - [x] Removed the page zoom prohibition without adding device-specific branches.
   - [x] Added browser security regression and 1,000/5,000-line Journal performance fixtures.
   - [x] Confirmed the deployed app on physical iPhone SE (3rd generation, iOS 26.6.1), including the long-document fixture and zoom/PWA acceptance; no numerical timings were supplied.
-  - [x] Published v2.3.4 assets; tag/Release creation and the separate OpenSpec archive complete the release workflow.
+  - [x] Published the v2.3.4 tag/Release and archived `improve-web-editor-safety` separately after release.
 
 - [x] **v2.3.3 iPhone Journal selection and Tasks Markdown preview** (2026-09-07)
   - [x] Fixed iPhone long-press “Select All” so it covers the complete Journal entry.

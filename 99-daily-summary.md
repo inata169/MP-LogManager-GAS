@@ -22,7 +22,7 @@ v2.3.4 is deployed and physically verified. Task and Journal now share one DOMPu
 ### Preserved Constraints
 - No data schema, GAS contract, or Google sync semantic changes.
 - No device-name or iPhone SE-specific implementation branch.
-- OpenSpec is archived in the post-release documentation commit.
+- Published the `v2.3.4` tag and GitHub Release, then archived `improve-web-editor-safety` separately under `openspec/changes/archive/2026-09-07-improve-web-editor-safety/`.
 
 ## v2.3.3 iPhone Journal and Tasks UX
 v2.3.3 fixes complete-text selection in long Journal entries on iPhone and adds a spacious, safe Markdown editing flow to Tasks without changing stored data formats or GAS contracts.

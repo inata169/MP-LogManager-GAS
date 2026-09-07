@@ -26,4 +26,4 @@
 ## 5. Release And Documentation
 - [x] 5.1 ローカル資産queryとService Workerキャッシュをv2.3.4へ更新する。
 - [x] 5.2 README、ユーザーマニュアル、release notes、daily summary、handover、Todoを更新する。
-- [ ] 5.3 デプロイと実機確認後にOpenSpec変更を別コミットでアーカイブする。
+- [x] 5.3 デプロイと実機確認後にOpenSpec変更を別コミットでアーカイブする。
