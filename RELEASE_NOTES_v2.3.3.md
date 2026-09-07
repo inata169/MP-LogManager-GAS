@@ -31,4 +31,4 @@ v2.3.3 improves long-form editing on iPhone. Journal now allows native “Select
 - Strict validation of `add-task-markdown-preview` and all live OpenSpec specs.
 - Responsive browser checks at 320×568, 390×844, and desktop widths, including dark mode.
 - Markdown rendering, hostile-markup sanitization, exact-source preservation, sanitizer fail-closed, iOS selection-option, and offline Service Worker regression checks.
-- Physical iPhone Safari/PWA long-press and copy verification remains recommended after deployment.
+- Physical iPhone Safari/PWA long-press “Select All” and copy verification completed successfully after deployment.

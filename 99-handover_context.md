@@ -1,7 +1,7 @@
 # Handover Context - 2026-09-07
 
 ## Current Status
-v2.3.3 is prepared for deployment from `main`. It fixes iPhone Journal full-text selection and adds a larger Tasks Markdown Edit/Preview workflow. The existing v2.3.2-r5 save/load diagnostics, manual Google sync behavior, data format, and GAS contract are preserved.
+v2.3.3 is deployed, verified on a physical iPhone, tagged, and published as a GitHub Release. It fixes iPhone Journal full-text selection and adds a larger Tasks Markdown Edit/Preview workflow. The existing v2.3.2-r5 save/load diagnostics, manual Google sync behavior, data format, and GAS contract are preserved.
 
 ## v2.3.3 Changes
 - On iPhone/iPad, CodeMirror uses `viewportMargin: Infinity` only for the contenteditable Journal input so native long-press “Select All” covers the complete entry.
@@ -10,7 +10,8 @@ v2.3.3 is prepared for deployment from `main`. It fixes iPhone Journal full-text
 - The shared Tasks Markdown renderer sanitizes both list and preview HTML with vendored DOMPurify 3.4.14 and fails closed to escaped text when unsupported or unavailable.
 - DOMPurify is loaded with SRI and included in the Service Worker precache.
 - Asset query strings are `v2.3.3`; the Service Worker cache is `mp-logmanager-gas-v2-3-3`.
-- The active OpenSpec change is `openspec/changes/add-task-markdown-preview/`, targeting the live `mobile-task-ux` capability. Archive it only after deployed behavior is verified.
+- The completed OpenSpec change is archived at `openspec/changes/archive/2026-09-07-add-task-markdown-preview/`; its requirements are merged into the live `mobile-task-ux` specification.
+- The live `journal` specification records the verified iPhone full-document selection behavior.
 
 ## v2.3.3 Verification
 - `node --check web/js/api.js`
@@ -21,10 +22,9 @@ v2.3.3 is prepared for deployment from `main`. It fixes iPhone Journal full-text
 - `openspec validate add-task-markdown-preview --strict --no-interactive`
 - `openspec validate --specs --strict --no-interactive`
 - Responsive browser, dark-mode, Markdown/XSS, exact-source, iOS selection-option, and offline Service Worker checks.
+- Physical iPhone Safari/PWA long-press and copy verification completed successfully.
 
 ## v2.3.3 Known Follow-ups
-- Perform final native long-press/copy verification on a physical iPhone Safari and installed PWA with a very long Journal entry.
-- After deployment verification, archive `add-task-markdown-preview` separately and re-run strict live-spec validation.
 - A future accessibility pass can add a complete modal focus trap and revisit the existing page zoom restriction.
 
 ## v2.3.2-r5 Follow-up

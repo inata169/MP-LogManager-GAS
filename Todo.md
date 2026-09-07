@@ -7,7 +7,8 @@
   - [x] Preserved the original Markdown source when previewing and saving.
   - [x] Added DOMPurify 3.4.14 and fail-closed sanitization for Tasks Markdown rendering.
   - [x] Updated versioned web assets and the Service Worker cache to v2.3.3.
-  - [x] Added and strictly validated the `add-task-markdown-preview` OpenSpec change.
+  - [x] Archived and strictly validated the `add-task-markdown-preview` OpenSpec change after deployment.
+  - [x] Confirmed iPhone Safari/PWA native “Select All” and copy on a physical device.
 
 - [x] **Developer setup documentation** (2026-06-13)
   - [x] Added `docs/DEV_SETUP.md` for per-PC setup.

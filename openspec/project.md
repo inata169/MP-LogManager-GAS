@@ -58,7 +58,7 @@ Personal Tasks and Journal data are stored in the user's own Google Drive throug
 - The app may be used around medical work, so avoid storing patient-identifying or sensitive personal data in GitHub.
 
 ## Important Constraints
-- Current v2.3.2-line constraints:
+- Current v2.3.3-line constraints:
   - Do not change the JSON schema or top-level data structure.
   - Do not change the GAS API contract.
   - Do not change Calendar sync semantics.

@@ -11,7 +11,8 @@ v2.3.3 fixes complete-text selection in long Journal entries on iPhone and adds 
 - Added vendored DOMPurify 3.4.14 with integrity metadata and offline precaching.
 - Sanitized the shared Tasks Markdown renderer for both the task list and editor preview, with an escaped-text fallback when sanitization is unavailable.
 - Bumped local web assets and the Service Worker cache to v2.3.3.
-- Added the active OpenSpec change `add-task-markdown-preview` under the live `mobile-task-ux` capability.
+- Archived `add-task-markdown-preview` after deployment and merged its requirements into the live `mobile-task-ux` specification.
+- Added the verified iPhone full-document selection behavior to the live `journal` specification.
 - Updated README, user manual, release notes, Todo, and handover documentation.
 
 ### Verification
@@ -20,12 +21,13 @@ v2.3.3 fixes complete-text selection in long Journal entries on iPhone and adds 
 - Responsive browser checks at 320×568, 390×844, and desktop widths, including dark mode.
 - Markdown positive cases, hostile HTML/URL sanitization cases, exact-source preservation, and sanitizer fail-closed behavior.
 - iOS/non-iOS CodeMirror option regression checks and offline Service Worker reload.
+- Physical iPhone Safari/PWA verification confirmed native long-press “Select All” and copy cover the complete Journal entry.
 
 ### Preserved Constraints
 - No JSON schema or top-level data structure changes.
 - No GAS API contract changes.
 - No Calendar sync semantic changes; task save still does not automatically sync Google services.
-- The OpenSpec change remains active until the deployed behavior is verified, then should be archived separately.
+- The deployed OpenSpec change is archived under `openspec/changes/archive/2026-09-07-add-task-markdown-preview/`.
 
 ## v2.3.2-r5 Release Completed
 v2.3.2-r5 was prepared as a small follow-up release for Calendar sync diagnostic feedback. The app behavior remains unchanged: readable GAS sync results that do not verify Calendar visibility are informational diagnostics, while fallback/CORS/unreadable responses remain warnings.

@@ -25,6 +25,10 @@ The Web App SHALL provide a WYSIWYG rich text editor for writing journal entries
 - **WHEN** opening a journal entry on a mobile device
 - **THEN** the editor toolbar is responsive and fully functioning without horizontal overflow
 
+#### Scenario: Select a complete long entry on iPhone
+- **WHEN** the user invokes the native “Select All” command in a long Journal entry on iPhone or iPad
+- **THEN** the complete Markdown source is selected regardless of the editor's current scroll position
+
 #### Scenario: Split View on Desktop
 - **WHEN** using a larger screen (PC)
 - **THEN** the editor supports a side-by-side split view mode for real-time previewing
